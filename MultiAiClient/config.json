@@ -1,0 +1,38 @@
+﻿[
+ {
+    "name": "腾讯元宝",
+    "url": "https://yuanbao.tencent.com/chat/",
+    "dataFolderName": "Data_tencent.yuanbao",
+    "iconPath": "Icons/yuanbao_logo.png"
+  },
+  {
+    "name": "ChatGPT",
+    "url": "https://chatgpt.com/",
+    "dataFolderName": "Data_ChatGPT",
+    "iconPath": "Icons/chartgpt_logo.png"
+  },
+
+  {
+    "name": "DeepSeek AI",
+    "url": "https://chat.deepseek.com/",
+    "dataFolderName": "Data_Deepseek",
+    "iconPath": "Icons/deepseek_logo.png"
+  },
+ 
+
+  {
+    "name": "Gemini AI",
+    "url": "https://gemini.google.com/app",
+    "dataFolderName": "Data_Gemini",
+    "iconPath": "Icons/gemini_logo.png"
+  },
+
+
+
+  {
+    "name": "腾讯元器智能体",
+    "url": "https://yuanqi.tencent.com/my-creation/agent",
+    "dataFolderName": "Data_tencent.yuanqi",
+    "iconPath": "Icons/yuanqi_logo.png"
+  }
+]
