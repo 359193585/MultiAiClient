@@ -64,3 +64,10 @@ AI 服务连接通过配置文件 `config.json` 进行管理和设置。您可�
     "iconPath": "Icons/yuanqi_logo.png"
   }
 ]
+
+
+# English Introduce
+A tool that integrates multiple web-based AI chat services, allowing users to open multiple AI chat windows in parallel via multiple tabs. Users can enter their prompts in a unified input box and send them to all AIs with one click.
+The program supports locating issues quickly, tracking the number of your questions, exporting all questions, analyzing the process of your interaction with AI, and optimizing your prompts.
+Developed using C#, the WPF framework, and WebView2, the project enables page interaction through JS injection.
+
