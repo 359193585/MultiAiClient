@@ -65,6 +65,7 @@ AI 服务连接通过配置文件 `config.json` 进行管理和设置。您可�
   }
 ]
 
+```
 
 # English Introduce
 A tool that integrates multiple web-based AI chat services, allowing users to open multiple AI chat windows in parallel via multiple tabs. Users can enter their prompts in a unified input box and send them to all AIs with one click.
