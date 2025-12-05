@@ -8,7 +8,7 @@ namespace MultiAIClient
         public static async Task<bool> InjectAndSubmitToDeepSeek1(WebView2 targetWebView, string text)
         {
             string currentUrl = targetWebView.Source?.ToString().ToLower() ?? "";
-            string cssSelector = GetSelectorByUrl(currentUrl);
+            string cssSelector = GetSelector.GetSelectorByUrl(currentUrl);
             try
             {
                 string script = $@"
@@ -265,7 +265,7 @@ namespace MultiAIClient
         public static async Task<bool> InjectAndSubmitToDeepSeek(WebView2 targetWebView, string text)
         {
             string currentUrl = targetWebView.Source?.ToString().ToLower() ?? "";
-            string cssSelector = GetSelectorByUrl(currentUrl);
+            string cssSelector = GetSelector.GetSelectorByUrl(currentUrl);
             text = EscapeJavaScriptText(text);
             try
             {

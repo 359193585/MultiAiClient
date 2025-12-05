@@ -1,14 +1,15 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace MultiAIClient
 {
@@ -34,12 +35,13 @@ namespace MultiAIClient
     public partial class MainWindow : Window
     {
         private readonly string AppDataPath =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MyMultiAIClientData");
+        System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MyMultiAIClientData");
 
         //private readonly string AppDataPath =  Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MyMultiAIClientData");
 
-        private Dictionary<TabItem, Microsoft.Web.WebView2.Wpf.WebView2> _tabWebViewMapping = new Dictionary<TabItem, Microsoft.Web.WebView2.Wpf.WebView2>();
-
+        private Dictionary<TabItem, WebView2> _tabWebViewMapping = [];
+        // 状态指示器字典
+        private Dictionary<TabItem, Ellipse> _statusIndicators = new Dictionary<TabItem, Ellipse>();
         public MainWindow()
         {
             InitializeComponent();
@@ -48,6 +50,7 @@ namespace MultiAIClient
             this.Height = screenHeight;
             this.MaxHeight = screenHeight;
             this.Top = 0;
+            this.Left = 0;
         }
         private async void InitializeAllTabs()
         {
@@ -79,42 +82,55 @@ namespace MultiAIClient
                     };
 
                     // 创建 TabItem
-                    object headerContent;
-
+                    // 创建 StackPanel 容器（用于水平排列图片和文字）
+                    var stackPanel = new StackPanel { Orientation = Orientation.Horizontal };
                     if (File.Exists(service.IconPath))
                     {
-                        // 创建 StackPanel 容器（用于水平排列图片和文字）
-                        var stackPanel = new StackPanel { Orientation = Orientation.Horizontal };
                         Image image = LoadIcon(service);
-                        var textBlock = new TextBlock { Text = service.Name };
-
-                        // 将 Image 和 TextBlock 添加到 StackPanel
                         stackPanel.Children.Add(image);
-                        stackPanel.Children.Add(textBlock);
+                    }
 
-                        headerContent = stackPanel;
-                    }
-                    else
+                    var textBlock = new TextBlock
                     {
-                        headerContent = service.Name;
-                    }
+                        Text = service.Name,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(5, 0, 0, 0)
+                    };
+                    stackPanel.Children.Add(textBlock);
+
+                    // 添加加载状态指示器（初始隐藏）
+                    var statusIndicator = new Ellipse
+                    {
+                        Width = 8,
+                        Height = 8,
+                        Fill = Brushes.Gray, // 初始灰色表示未加载
+                        Margin = new Thickness(8, 0, 0, 0),
+                        Visibility = Visibility.Collapsed,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    stackPanel.Children.Add(statusIndicator);
+
                     var tabItem = new TabItem()
                     {
-                        Header = headerContent,
+                        Header = stackPanel,
                         Content = webView,
                         Tag = service
                     };
                     tabItem.ContextMenu = (ContextMenu)this.FindResource("TabItemContextMenu");
                     _tabWebViewMapping.Add(tabItem, webView);
+                    _statusIndicators.Add(tabItem, statusIndicator);
 
+                    UpdateTabStatus(tabItem, TabStatus.NotLoaded);
                     AIAggregatorTabs.Items.Add(tabItem);
-                    AIAggregatorTabs.SelectionChanged += OnTabSelectionChanged;
+
                     _ = InitializeWebViewWithEnvironment(
                         webView: webView,
                         url: service.Url,
                         serviceName: service.Name,
-                        dataFolderName: service.DataFolderName
+                        dataFolderName: service.DataFolderName,
+                        tabItem: tabItem
                     );
+                    AIAggregatorTabs.SelectionChanged += OnTabSelectionChanged;
                 }
             }
             catch (Exception ex)
@@ -141,7 +157,8 @@ namespace MultiAIClient
                            webView: targetWebView,
                            url: serviceConfig.Url,
                            serviceName: serviceConfig.Name,
-                           dataFolderName: serviceConfig.DataFolderName
+                           dataFolderName: serviceConfig.DataFolderName,
+                           tabItem: selectedTabItem
                             );
                     }
                 }
@@ -150,8 +167,8 @@ namespace MultiAIClient
                     // 已经初始化
                     // 刷新页面（可选）
                     //targetWebView.Reload();
-                    
-                    
+                    UpdateTabStatus(selectedTabItem, TabStatus.Loaded);
+
                 }
             }
         }
@@ -184,16 +201,18 @@ namespace MultiAIClient
             WebView2 webView,
             string url,
             string serviceName,
-            string dataFolderName)
+            string dataFolderName,
+            TabItem tabItem)
         {
             try
             {
                 //  构造唯一的、隔离的用户数据文件夹路径
-                string userDataPath = Path.Combine(AppDataPath, dataFolderName);
+                string userDataPath = System.IO.Path.Combine(AppDataPath, dataFolderName);
                 if (!Directory.Exists(userDataPath))
                 {
                     Directory.CreateDirectory(userDataPath);
                 }
+                UpdateTabStatus(tabItem, TabStatus.NotLoaded);
 
                 //  创建 CoreWebView2Environment,传递给 WebView2 控件
                 CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath);
@@ -205,26 +224,78 @@ namespace MultiAIClient
                 {
                     webView.Source = new Uri(url);
                     Console.WriteLine($"{serviceName} 初始化成功，数据路径: {userDataPath}");
+                    // 订阅导航开始事件（显示加载中）
+                    webView.CoreWebView2.NavigationStarting += (sender, e) =>
+                    {
+                        UpdateTabStatus(tabItem, TabStatus.Loading);
+                    };
                 }
                 Console.WriteLine($"{serviceName} 环境预初始化成功，数据路径: {userDataPath}");
                 webView.NavigationCompleted += WebView2_NavigationCompleted;
+
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"初始化 {serviceName} 失败: {ex.Message}");
+                UpdateTabStatus(tabItem, TabStatus.Error);
             }
         }
+        public enum TabStatus
+        {
+            NotLoaded,   // 未加载 - 无指示点
+            Loading,     // 加载中 - 黄色
+            Loaded,      // 加载完成 - 绿色
+            Error        // 加载错误 - 红色
+        }
 
+        // 更新页签状态的方法
+        private void UpdateTabStatus(TabItem tabItem, TabStatus status)
+        {
+            // 确保在UI线程上执行
+            Dispatcher.Invoke(() =>
+            {
+                if (_statusIndicators.TryGetValue(tabItem, out Ellipse statusIndicator))
+                {
+                    switch (status)
+                    {
+                        case TabStatus.NotLoaded:
+                            statusIndicator.Visibility = Visibility.Collapsed;
+                            break;
+                        case TabStatus.Loading:
+                            statusIndicator.Fill = Brushes.Yellow;
+                            statusIndicator.Visibility = Visibility.Visible;
+                            statusIndicator.ToolTip = "加载中...";
+                            break;
+                        case TabStatus.Loaded:
+                            statusIndicator.Fill = Brushes.LimeGreen;
+                            statusIndicator.Visibility = Visibility.Visible;
+                            statusIndicator.ToolTip = "已加载";
+                            break;
+                        case TabStatus.Error:
+                            statusIndicator.Fill = Brushes.Red;
+                            statusIndicator.Visibility = Visibility.Visible;
+                            statusIndicator.ToolTip = "加载失败";
+                            break;
+                    }
+                }
+            });
+        }
+
+        //页面加载完成，进行注入脚本，修改状态指示
         private async void WebView2_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             WebView2? webView2 = sender as WebView2;
-            if (webView2 == null)
-                return;
-            // 可以检查导航是否成功完成
+            if (webView2 == null) return;
+
+            // 检查导航是否成功完成
             if (e.IsSuccess)
             {
+                var activeTabItem = AIAggregatorTabs.SelectedItem as TabItem;
+                UpdateTabStatus(activeTabItem, TabStatus.Loaded); //完成，显示绿点
+
                 // 根据当前URL决定要注入的脚本
-                string[] cssSelector = InjectTextIntoInput.GetSelectorsByUrl(webView2.Source.ToString().ToLower() ?? "");
+                string[] cssSelector = GetSelector.GetSelectorsByUrl(webView2.Source.ToString().ToLower() ?? "");
 #if DEBUG
                 string js = InjectTextIntoInput.ChatMessageNavi_Debug(cssSelector[1]);
 #endif
@@ -233,8 +304,30 @@ namespace MultiAIClient
 #endif
                 try
                 {
-                    await webView2.CoreWebView2.ExecuteScriptAsync(js);
-                    Debug.WriteLine("导航完成，脚本注入成功。");
+                    await webView2.CoreWebView2.ExecuteScriptAsync(js);//注入问题查询脚本  所有页面都注入，但js不一样，会随着选择器进行调整
+
+                    string currentUrl = webView2.Source?.ToString().ToLower() ?? "";
+                    if (currentUrl.Contains("gemini.google.com") || currentUrl.Contains("gemini"))
+                    {
+                        //Gemini
+                    }
+                    else if (currentUrl.Contains("yuanbao.tencent.com"))
+                    {
+                        // 腾讯元宝
+                        await InjectTextIntoInput.InjectToYuanbao(webView2);
+                    }
+                    else if (currentUrl.Contains("chatgpt.com"))
+                    {
+                        // ChatGPT
+                    }
+                    else if (currentUrl.Contains("deepseek.com"))
+                    {
+                        //deepseek
+                    }
+
+
+
+                    Debug.WriteLine("导航完成，所有脚本注入成功。");
                 }
                 catch (Exception ex)
                 {
@@ -309,6 +402,8 @@ namespace MultiAIClient
         }
         private async void UniversalSendButton_Click(object sender, RoutedEventArgs e)
         {
+            _ = await GetAllQuestions();//显示当前会话的提问次数
+
             string inputText = UniversalInputTextBox.Text.Trim();
             if (string.IsNullOrEmpty(inputText))
             {
@@ -316,54 +411,71 @@ namespace MultiAIClient
                 return;
             }
 
-            // 遍历所有WebView2实例
-            foreach (var webViewPair in _tabWebViewMapping)
+            // 检查是否仅发送到当前激活的页签
+            if ((bool)checkBoxSendOnly.IsChecked)
             {
-                WebView2 targetWebView = webViewPair.Value;
-
-                // 确保WebView2核心组件已加载
-                if (targetWebView?.CoreWebView2 == null)
+                var (tabItem, targetWebView, tabName) = GetActiveTabInfo();
+                if (targetWebView == null)
                 {
-                    continue; // 跳过未初始化的WebView2
+                    MessageBox.Show("没有激活的页签");
+                    return;
                 }
+                await InjectTextToWebview(inputText, targetWebView);
+            }
+            else
+            {
+                // 遍历所有WebView2实例
+                foreach (var webViewPair in _tabWebViewMapping)
+                {
+                    WebView2 targetWebView = webViewPair.Value;
 
-                try
-                {
-                    // 获取当前WebView2正在访问的URL，用于判断是哪个AI网站
-                    string currentUrl = targetWebView.Source?.ToString().ToLower() ?? "";
-                    if (currentUrl.Contains("gemini.google.com") || currentUrl.Contains("gemini"))
+                    // 确保WebView2核心组件已加载
+                    if (targetWebView?.CoreWebView2 == null)
                     {
-                        //Gemini
-                        await InjectTextIntoInput.InjectIntoGeminiWithRetry(targetWebView, inputText);
+                        continue; // 跳过未初始化的WebView2
                     }
-                    else if (currentUrl.Contains("yuanbao.tencent.com"))
-                    {
-                        // 腾讯元宝
-                        await InjectTextIntoInput.InjectAndSubmitToYuanbao(targetWebView, inputText);
-                    }
-                    else if (currentUrl.Contains("chatgpt.com"))
-                    {
-                        // ChatGPT
-                        await InjectTextIntoInput.InjectIntoChatgptWithRetry(targetWebView, inputText);
-                    }
-                    else if (currentUrl.Contains("deepseek.com"))
-                    {
-                        //deepseek
-                        await InjectTextIntoInput.InjectIntoDeepseekWithRetry(targetWebView, inputText);
-                    }
-                    
-                }
-                catch (Exception ex)
-                {
-                    // 处理单个页签注入失败的情况，避免影响其他页签
-                    Debug.WriteLine($"注入文本到页签失败: {ex.Message}");
+                    await InjectTextToWebview(inputText, targetWebView);
                 }
             }
-
-            // 可选：清空主输入框
-            // UniversalInputTextBox.Clear();
+            // 清空主输入框
+            if((bool)checkBoxClean.IsChecked) UniversalInputTextBox.Clear();
             
-            _= await GetAllQuestions();//显示当前会话的提问次数
+        }
+
+        private static async Task InjectTextToWebview(string inputText, WebView2 targetWebView)
+        {
+            try
+            {
+                // 获取当前WebView2正在访问的URL，用于判断是哪个AI网站
+                string currentUrl = targetWebView.Source?.ToString().ToLower() ?? "";
+                if (currentUrl.Contains("gemini.google.com") || currentUrl.Contains("gemini"))
+                {
+                    //Gemini
+                    await InjectTextIntoInput.InjectIntoGeminiWithRetry(targetWebView, inputText);
+                }
+                else if (currentUrl.Contains("yuanbao.tencent.com"))
+                {
+                    // 腾讯元宝
+                    //await InjectTextIntoInput.InjectAndSubmitToYuanbao(targetWebView, inputText);
+                    await InjectTextIntoInput.SubmitToYuanbao(targetWebView, inputText);
+                }
+                else if (currentUrl.Contains("chatgpt.com"))
+                {
+                    // ChatGPT
+                    await InjectTextIntoInput.InjectIntoChatgptWithRetry(targetWebView, inputText);
+                }
+                else if (currentUrl.Contains("deepseek.com"))
+                {
+                    //deepseek
+                    await InjectTextIntoInput.InjectIntoDeepseekWithRetry(targetWebView, inputText);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // 处理单个页签注入失败的情况，避免影响其他页签
+                Debug.WriteLine($"注入文本到页签失败: {ex.Message}");
+            }
         }
 
         private async void ButtonNextMesg_Click(object sender, RoutedEventArgs e)

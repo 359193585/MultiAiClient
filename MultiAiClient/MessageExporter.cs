@@ -33,15 +33,15 @@ namespace MultiAIClient
 
             bool? dialogResult = saveFileDialog.ShowDialog();
 
-             string fullPath = saveFileDialog.FileName;
+            string fullPath = saveFileDialog.FileName;
             if (dialogResult == true)
             {
                 try
                 {
                     WriteMessagesToFile(messages, currentUrl, fullPath);
                     MessageBox.Show($"消息已成功导出到：\n{fullPath}", "导出成功", MessageBoxButton.OK, MessageBoxImage.Information);
-                    string directoryPath = Path.GetDirectoryName(fullPath);
-                    if (Directory.Exists(directoryPath))
+                    string? directoryPath = Path.GetDirectoryName(fullPath);
+                    if (!string.IsNullOrEmpty(directoryPath) && Directory.Exists(directoryPath))
                     {
                         Process.Start("explorer.exe", directoryPath);
                     }

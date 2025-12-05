@@ -9,7 +9,7 @@
         Title="我的多 AI 客户端"
         Icon="/Icons/MyAppIcon.ico"
         MinHeight="400"
-        Width="1080">
+        Width="1440">
 
     <Window.Resources>
         <ContextMenu x:Key="TabItemContextMenu">
@@ -59,21 +59,46 @@
                      MaxHeight="320"
                      FontSize="14"
                      Padding="8"/>
-                <!-- 右下方button区-->
+                <!-- 输入框右边的button列 -->
                 <Border Grid.Column="1" Background="#f5f5f5" BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
-                    <Grid Name="button">
+                    <Grid Name="allButtons" Width="240">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition Height="0*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" x:Name="UniversalSendButton" Content="发送" 
-                                 Margin="10,0,0,0" Padding="15,5" Background="#3963D9" Foreground="White"
+
+                        <Border Grid.Column="0"  Background="#f5f5f5" BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="6*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <Button Grid.Row="0" x:Name="UniversalSendButton" Content="发送" 
+                                 Margin="5,0,0,0" Padding="5,5" Background="#3963D9" Foreground="White"
                                 Click="UniversalSendButton_Click"/>
+                                <CheckBox x:Name="checkBoxSendOnly"  Grid.Row="1" IsChecked="False" Content="只发本窗口" 
+                                           VerticalAlignment="Center"
+          VerticalContentAlignment="Center" Background="#FFC3C9DA" Foreground="Black" FontSize="14"/>
+                                <CheckBox x:Name="checkBoxClean" Grid.Row="2" IsChecked="True"  Content="发送后清空" 
+                                            VerticalAlignment="Center"
+          VerticalContentAlignment="Center" Background="#FFC3C9DA" Foreground="Black" FontSize="14"/>
+                            </Grid>
+                        </Border>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
                         <Border Grid.Column="1" >
                             <Grid>
                                 <Grid.RowDefinitions>

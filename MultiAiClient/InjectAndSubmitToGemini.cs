@@ -9,7 +9,7 @@ namespace MultiAIClient
         {
             await Task.Delay(1000); // 额外等待1秒确保动态内容加载
             string currentUrl = webView.Source?.ToString().ToLower() ?? "";
-            string cssSelector = GetSelectorByUrl(currentUrl);
+            string cssSelector = GetSelector.GetSelectorByUrl(currentUrl);
             text = EscapeJavaScriptText(text);
             string script = $@"
                     (function() {{

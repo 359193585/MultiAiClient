@@ -10,7 +10,7 @@ namespace MultiAIClient
         public static async Task InjectTextIntoInputBox(WebView2 targetWebView, string text)
         {
             string currentUrl = targetWebView.Source?.ToString().ToLower() ?? "";
-            string cssSelector = GetSelectorByUrl(currentUrl);
+            string cssSelector = GetSelector.GetSelectorByUrl(currentUrl);
             if (string.IsNullOrEmpty(cssSelector)) return;
             string[] candidateSelectors = new string[] {
         cssSelector, // 主选方案
@@ -328,37 +328,7 @@ function getMesgStr() {
     ";
         }
         
-        // 根据URL获取选择器
-        public static string GetSelectorByUrl(string url)
-        {
-            if (url.Contains("yuanbao.tencent.com")) return ".ql-editor";
-            if (url.Contains("gemini.google.com")) return "div.ql-editor.textarea.new-input-ui";
-            if (url.Contains("chatgpt.com")) return "#prompt-textarea";
-            if (url.Contains("deepseek.com")) return "textarea";
-
-
-
-            if (url.Contains("chat.openai.com")) return "#prompt-textarea";
-            if (url.Contains("claude.ai")) return ".prose textarea";
-            return "";
-        }
-        public static string[] GetSelectorsByUrl(string url)
-        {
-            if (url.Contains("yuanbao.tencent.com"))
-                return new string[] { ".ql-editor", ".hyc-component-text .hyc-content-text" };
-
-            if (url.Contains("gemini.google.com"))
-                return new string[] { "div.ql-editor.textarea.new-input-ui", "" };
-
-            if (url.Contains("chatgpt.com"))
-                return new string[] { "#prompt-textarea", "div[data-message-author-role=\"user\"]" };
-
-            if (url.Contains("deepseek.com"))
-                return new string[] { "textarea", ".ds-message .fbb737a4" };
-
-
-            return new string[] { "", "" };
-        }
+      
         internal static async Task InjectRunIndexQuestion(WebView2 webView, string command)
         {
             string currentUrl = webView.Source?.ToString().ToLower() ?? "";
