@@ -1,4 +1,22 @@
-﻿using Microsoft.Win32;
+﻿/*****************************************
+ *
+ * 项目名称： MultiAIClient  
+ * 文 件 名:  MessageExporter.cs
+ * 命名空间： MultiAIClient
+ * 描    述:  
+ * 
+ * 版    本：  V1.0
+ * 创 建 者：  liuxin
+ * 电子邮件：  359193585@qq.com(leison)
+ * 创建时间：  2025/12/4 18:44
+ * ======================================
+ * 历史更新记录
+ * 版本：V          修改时间：         修改人：
+ * 修改内容：
+ * ======================================
+*********************************************/
+
+using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
 using System.Text;

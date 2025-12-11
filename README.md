@@ -1,4 +1,4 @@
-# 🤖 AI 聊天集成工具 (C# / WPF / WebView2)
+﻿# 🤖 AI 聊天集成工具 (C# / WPF / WebView2)
 
 这是一个将多个 **Web 端 AI 聊天服务** 集成到统一界面的工具。它旨在提升您与多个 AI 同时交互的效率，并通过统一的输入和分析功能来优化您的提示词工程（Prompt Engineering）流程。
 
