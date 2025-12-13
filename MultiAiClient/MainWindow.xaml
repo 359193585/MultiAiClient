@@ -10,6 +10,7 @@
         Icon="Icons/MyAppIcon.ico"
         ShowInTaskbar="True"
         MinHeight="400"
+        Height="1440"
         Width="1440">
 
     <Window.Resources>
@@ -18,6 +19,9 @@
             <MenuItem Header="浏览器打开" Click="OpenInBrowserMenuItem_Click"/>
             <!-- 可以继续添加其他菜单项，如"关闭页签"、"关闭其他页签"等 -->
         </ContextMenu>
+        
+    
+
     </Window.Resources>
 
 
@@ -26,25 +30,28 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="5"/>
-            <RowDefinition Height="Auto" MinHeight="100"/>
+            <RowDefinition Height="300" MinHeight="300"/>
         </Grid.RowDefinitions>
 
-        <!-- 第1行：输入区域容器 -->
-        <TabControl Grid.Row="0" Name="AIAggregatorTabs"/>
+        <!-- 第1行：  tabcontrol 容器 区域-->
+        <TabControl Grid.Row="0" 
+                    Style="{StaticResource FlatTabControlStyle}"
+                    Name="AIAggregatorTabs"/>
+                    <!--ItemContainerStyle="{StaticResource FlatTabItemStyle}"-->
 
-        <GridSplitter 
-        Grid.Row="1" 
+        <GridSplitter  Grid.Row="1" 
         Height="5"           
-        VerticalAlignment="Top" 
+        VerticalAlignment="Stretch" 
         HorizontalAlignment="Stretch" 
         Background="LightGray"
         ResizeDirection="Rows"
         ShowsPreview="True"
-        Margin="0,-3,0,0"/>
+       />
 
         <!-- 统一输入区域 -->
-        <!-- 第2行：输入区域容器 -->
-        <Border Grid.Row="2" Background="#f5f5f5" BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
+        <!-- 第2行：输入和发送控制容器 -->
+        <Border Grid.Row="2" Background="{StaticResource Brush.Background.Main}" 
+                BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
             <Grid x:Name="bottom">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -52,76 +59,141 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- 多行输入框 -->
-                <TextBox Grid.Column="0" x:Name="UniversalInputTextBox"
-                     AcceptsReturn="True"
-                     TextWrapping="Wrap"
-                     VerticalScrollBarVisibility="Auto"
-                     MinHeight="300"
-                     MaxHeight="320"
-                     FontSize="14"
-                     Padding="8"/>
+                <Border Grid.Column="0"  Background="{StaticResource Brush.Background.Main}" 
+                        BorderBrush="{StaticResource Brush.Border.Light}" BorderThickness="0,0,0,0" Padding="3">
+                    <Grid VerticalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0"  
+                                 x:Name="UniversalInputTextBox"
+                                 Style="{StaticResource RoundedTextBoxStyle}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 FontSize="14"/>  
+                    </Grid>
+                </Border>
+                
+                
+                
                 <!-- 输入框右边的button列 -->
-                <Border Grid.Column="1" Background="#f5f5f5" BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
+                <Border Grid.Column="1" Background="{StaticResource Brush.Background.Main}" 
+                        BorderBrush="{StaticResource Brush.Border.Light}" BorderThickness="0,0,0,0" Padding="1">
                     <Grid Name="allButtons" Width="240">
                         <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition Height="0*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="3*"/>
                         </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
 
-
-                        <Border Grid.Column="0"  Background="#f5f5f5" BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
+                        <!-- button区域的 第1行 -->
+                        <Border Grid.Row="0"  
+                                Background="{StaticResource Brush.Background.Main}" 
+                                BorderBrush="{StaticResource Brush.Border.Light}" 
+                                BorderThickness="1,1,0,0" Padding="4">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="6*"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="3*"/>
                                 </Grid.RowDefinitions>
                                 
-                                <Button Grid.Row="0" x:Name="UniversalSendButton" Content="发送" 
-                                 Margin="5,0,0,0" Padding="5,5" Background="#3963D9" Foreground="White"
-                                Click="UniversalSendButton_Click"/>
-                                <CheckBox x:Name="checkBoxSendOnly"  Grid.Row="1" IsChecked="False" Content="只发本窗口" 
-                                           VerticalAlignment="Center"
-          VerticalContentAlignment="Center" Background="#FFC3C9DA" Foreground="Black" FontSize="14"/>
-                                <CheckBox x:Name="checkBoxClean" Grid.Row="2" IsChecked="True"  Content="发送后清空" 
-                                            VerticalAlignment="Center"
-          VerticalContentAlignment="Center" Background="#FFC3C9DA" Foreground="Black" FontSize="14"/>
+                                <Button Grid.Row="0" 
+                                        x:Name="UniversalSendButton" 
+                                        Content="发送" 
+                                        Margin="5,0,0,0" Padding="0,5" 
+                                        Style="{StaticResource Button.Rounded.Primary}"
+                                        Click="UniversalSendButton_Click"/>
+                                
+                                <CheckBox Grid.Row="1" 
+                                          x:Name="checkBoxSendOnly"  
+                                          IsChecked="False" 
+                                          Content="只发本窗口" 
+                                          VerticalAlignment="Center" 
+                                          HorizontalAlignment="Center"
+                                           Padding="3,3"
+                                          VerticalContentAlignment="Center" Background="#FFC3C9DA" 
+                                          Foreground="Black" FontSize="14"/>
+                                
+                                
+                                <CheckBox  Grid.Row="2" 
+                                           x:Name="checkBoxClean"
+                                           IsChecked="True"  
+                                           Content="发送后清空" 
+                                            VerticalAlignment="Center" 
+                                           HorizontalAlignment="Center"
+                                           VerticalContentAlignment="Center"
+                                            Padding="3,3"
+                                           Background="#FFC3C9DA" 
+                                           Foreground="Black" FontSize="14"/>
                             </Grid>
                         </Border>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <Border Grid.Column="1" >
+
+
+
+
+
+
+
+                        <!-- 第二行，放置 问题导航显示的按钮-->
+                        <Border Grid.Row="1"  
+                                BorderBrush="{StaticResource Brush.Border.Light}"
+                                BorderThickness="0,0,1,1" Padding="0">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <Button Grid.Row="0" x:Name="prevMesgButton" Content="上一问题"
-                                        Margin="5,10,5,5" Padding="15,5" Background="#857DC0" Foreground="White"
-                                        Click="ButtonPrevMesg_Click"/>
-                                <Button Grid.Row="1" x:Name="nextMesgNutton" Content="下一问题"
-                                        Margin="5,5,5,10" Padding="15,5" Background="#857DC0" Foreground="White"
-                                        Click="ButtonNextMesg_Click"/>
-                                <Label Grid.Row="2" x:Name="mesgCount" Content="/"
-                                       Margin="5,5,5,10" Padding="15,5"  Foreground="Black" HorizontalContentAlignment="Right"
+
+                                <Border Grid.Row="0" >
+                                    <Grid>
+                                        <Label x:Name="mesgCount" Content="/"
+                                               Margin="5,5,5,10" Padding="15,5"  
+                                               Foreground="Black" 
+                                               VerticalAlignment="Center" HorizontalAlignment="Center"
                                        />
-                                <Button Grid.Row="3" x:Name="exportMesg" Content="导出全部问题"
-                                        Margin="5,5,5,10" Padding="15,5" Background="#857DC0" Foreground="White"
-                                        Click="ButtonExportMesg_Click"/>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="1" >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <Button Grid.Column="0" 
+                                                x:Name="prevMesgButton" 
+                                                Content="上一问题"
+                                                Margin="5,10,5,5" Padding="15,5" 
+                                                 Style="{StaticResource Button.Rounded.Secondary}"
+                                                Click="ButtonPrevMesg_Click"/>
+
+                                        <Button Grid.Column="1" 
+                                                x:Name="nextMesgNutton" 
+                                                Content="下一问题"
+                                                Margin="5,10,5,5" Padding="15,5" 
+                                                 Style="{StaticResource Button.Rounded.Secondary}"
+                                                Click="ButtonNextMesg_Click" />
+                                    </Grid>
+                                </Border>
+                                
+                                
+                                <Border Grid.Row="2" >
+                                    <Grid>
+                                        <Button  x:Name="exportMesg" 
+                                                 Content="导出全部问题"
+                                                 Margin="5,5,5,10" Padding="15,5" 
+                                                 Style="{StaticResource Button.Rounded.Secondary}"
+                                                 Click="ButtonExportMesg_Click" />
+                                    </Grid>
+                                </Border>
                             </Grid>
                         </Border>
+                        
+                        
+                        
+                        
                     </Grid>
                 </Border>
 

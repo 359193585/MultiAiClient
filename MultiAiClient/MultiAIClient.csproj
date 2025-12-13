@@ -36,7 +36,6 @@
     <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252357" />
     <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252358" />
     <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252359" />
-    <None Remove="Icons\yuanbao_logo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,9 +46,6 @@
     <Content Include="Icons\MyAppIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Icons\yuanbao_logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   
@@ -62,6 +58,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Icons\deepseek_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Icons\doubao_logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Icons\gemini_logo.png">
@@ -85,6 +84,9 @@
     <None Update="Icons\MyAppIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Icons\yuanbao_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Icons\yuanqi_logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -104,9 +106,7 @@
 
 
 	<!-- 【Release模式】定义目标，在构建后自动混淆所有JS文件并嵌入 -->
-	<Target Name="ObfuscateAllJavaScript"
-			BeforeTargets="BeforeBuild;CoreCompile" 
-			Condition="'$(Configuration)' == 'Release'" >
+	<Target Name="ObfuscateAllJavaScript" BeforeTargets="BeforeBuild;CoreCompile" Condition="'$(Configuration)' == 'Release'">
 
 		<!-- 1. 查找所有原始JS文件,并排除可能已混淆的文件 -->
 		<ItemGroup>
@@ -124,13 +124,11 @@
 		<!-- 3. 执行混淆命令（使用javascript-obfuscator） -->
 
 			<!-- 使用批处理元数据执行混淆命令 -->
-			<Exec Command="npx javascript-obfuscator &quot;%(OriginalJsFiles.Identity)&quot; --output &quot;ComInjectScripts\obfuscated\%(RecursiveDir)%(Filename).obfuscated.js&quot; --compact true --self-defending true "
-				  WorkingDirectory="$(MSBuildProjectDirectory)"
-				  Condition="'@(OriginalJsFiles)' != ''"/>
+			<Exec Command="npx javascript-obfuscator &quot;%(OriginalJsFiles.Identity)&quot; --output &quot;ComInjectScripts\obfuscated\%(RecursiveDir)%(Filename).obfuscated.js&quot; --compact true --self-defending true " WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'@(OriginalJsFiles)' != ''" />
 	 
 
 		<!-- 4. 将生成的所有混淆后文件添加为嵌入式资源 -->
-        <ItemGroup  Condition="'@(ObfuscatedJsFiles)' != ''" >
+        <ItemGroup Condition="'@(ObfuscatedJsFiles)' != ''">
 		    <EmbeddedResource Include="@(ObfuscatedJsFiles)" />
 		</ItemGroup>
 		
@@ -151,6 +149,9 @@
 	<ItemGroup>
 	  <Content Remove="ComInjectScripts\snippet%253A\**" />
 	  <Content Remove="ComInjectScripts\yuanbao.tencent.com\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="webview2-overrides\" />
 	</ItemGroup>
 
 

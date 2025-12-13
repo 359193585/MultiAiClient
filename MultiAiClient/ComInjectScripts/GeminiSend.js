@@ -16,7 +16,6 @@
     function tryCompleteOperation(cssSelector, injectText, sendBtnSelector) {
         console.log('开始处理...');
         attempts++;
-        debugger;
         // 1. 查找输入框
         const inputElement = document.querySelector(cssSelector);
         if (!inputElement) {

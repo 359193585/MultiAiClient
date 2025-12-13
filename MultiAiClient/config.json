@@ -1,7 +1,19 @@
 ﻿[
 
-
-
+  {
+    "name": "Gemini AI",
+    "url": "https://gemini.google.com/app",
+    "dataFolderName": "Data_Gemini",
+    "iconPath": "Icons/gemini_logo.png"
+  },
+  
+ {
+    "name": "ChatGPT",
+    "url": "https://chatgpt.com/",
+    "dataFolderName": "Data_ChatGPT",
+    "iconPath": "Icons/chartgpt_logo.png"
+  },
+   
   {
     "name": "DeepSeek AI",
     "url": "https://chat.deepseek.com/",
@@ -10,19 +22,14 @@
   },
  
   {
-    "name": "Gemini AI",
-    "url": "https://gemini.google.com/app",
-    "dataFolderName": "Data_Gemini",
-    "iconPath": "Icons/gemini_logo.png"
+    "name": "豆包",
+    "url": "https://www.doubao.com/chat/",
+    "dataFolderName": "Data_doubao",
+    "iconPath": "Icons/doubao_logo.png"
   },
 
- {
-    "name": "ChatGPT",
-    "url": "https://chatgpt.com/",
-    "dataFolderName": "Data_ChatGPT",
-    "iconPath": "Icons/chartgpt_logo.png"
-  },
- 
+
+
   
   {
     "name": "腾讯元宝",

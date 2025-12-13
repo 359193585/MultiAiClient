@@ -3,7 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:MultiAIClient"
              StartupUri="MainWindow.xaml">
+    
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <!-- 基础颜色 -->
+                <ResourceDictionary Source="Styles/Colors.xaml"/>
+                <ResourceDictionary Source="Styles/Brushes.xaml"/>
+
+                <!-- 按钮样式 -->
+                <ResourceDictionary Source="Styles/Buttons/Button.Rounded.xaml"/>
+
+                <!-- 输入框样式 -->
+                <ResourceDictionary Source="Styles/TextBox/TextBoxRounded.xaml"/>
+
+                <!-- 复选框样式 -->
+                
+                <!--TabControl样式 -->
+                <ResourceDictionary Source="Styles/TabControl/TabControl.Base.xaml"/>
+                <ResourceDictionary Source="/Styles/TabControl/TabControl.Flat.xaml"/>
+                <ResourceDictionary Source="Styles/TabControl/TabItem.Flat.xaml"/>
+                <ResourceDictionary Source="Styles/TabControl/TabItem.Card.xaml"/>
+                <ResourceDictionary Source="Styles/TabControl/TabItem.Browser.xaml"/>
+                
+                <!-- 阴影效果 -->
+                <ResourceDictionary Source="Styles/Effects/ShadowEffects.xaml"/>
+                
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

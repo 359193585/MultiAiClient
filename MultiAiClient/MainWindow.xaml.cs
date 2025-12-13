@@ -361,6 +361,16 @@ namespace MultiAIClient
                         //deepseek
                         await InjectDeepseek.InjectModule(webView);
                     }
+                    else if (currentUrl.Contains("doubao.com"))
+                    {
+                        //豆包
+                        await InjectCommno.InjectModule(webView);
+                    }
+                    else
+                    {
+                        //其他类似的AI对话
+                        await InjectCommno.InjectModule(webView);
+                    }
 
                     Debug.WriteLine("导航完成，所有脚本注入成功。");
                 }
@@ -503,6 +513,16 @@ namespace MultiAIClient
                 {
                     //deepseek
                     await InjectDeepseek.SubmitQuestion(targetWebView, inputText);
+                }
+                else if (currentUrl.Contains("doubao.com"))
+                {
+                    //豆包AI
+                    await InjectCommno.SubmitQuestion(targetWebView, inputText);
+                }
+                else 
+                {
+                    //其他任意网站
+                    await InjectCommno.SubmitQuestion(targetWebView, inputText);
                 }
 
             }
@@ -665,4 +685,6 @@ namespace MultiAIClient
             return (new List<string>(), string.Empty);
         }
     }
+
+   
 }

@@ -26,39 +26,49 @@ namespace MultiAIClient
 {
     internal class GetSelector
     {
-        // 根据URL获取选择器
-        internal static string GetSelectorByUrl(string url)
+        /// <summary>
+        ///  根据URL获取选择器
+        /// </summary>
+        /// <param name="currentUrl"></param>
+        /// <returns>stringp[],依次是：输入框选择器，提问问题选择器，发送按钮选择器</returns>
+        internal static string[] GetSelectorsByUrl(string currentUrl)
         {
-            if (url.Contains("yuanbao.tencent.com")) return ".ql-editor";
-            if (url.Contains("gemini.google.com")) return "div.ql-editor.textarea.new-input-ui";
-            if (url.Contains("chatgpt.com")) return "#prompt-textarea";
-            if (url.Contains("deepseek.com")) return "textarea";
+            if (currentUrl.Contains("yuanbao.tencent.com"))
+                return [
+                    ".ql-editor", 
+                    ".hyc-component-text .hyc-content-text", 
+                    "#yuanbao-send-btn"];
 
-
-
-            if (url.Contains("chat.openai.com")) return "#prompt-textarea";
-            if (url.Contains("claude.ai")) return ".prose textarea";
-            return "";
-        }
-        internal static string[] GetSelectorsByUrl(string url)
-        {
-            if (url.Contains("yuanbao.tencent.com"))
-                return new string[] { ".ql-editor", ".hyc-component-text .hyc-content-text", "#yuanbao-send-btn" };
-
-            if (url.Contains("gemini.google.com"))
-                return new string[] { 
+            if (currentUrl.Contains("gemini.google.com"))
+                return [ 
                     "div.ql-editor.textarea.new-input-ui",
-                    ".query-text-line.ng-star-inserted" ,
-                    ".mdc-icon-button.submit"};
+                    "span[class=\"user-query-bubble-with-background ng-star-inserted\"]" ,
+                    ".mdc-icon-button.submit"];
 
-            if (url.Contains("chatgpt.com"))
-                return new string[] { "#prompt-textarea", "div[data-message-author-role=\"user\"]" , "#composer-submit-button" };
+            if (currentUrl.Contains("chatgpt.com"))
+                return [
+                    "#prompt-textarea", 
+                    "div[data-message-author-role=\"user\"]" , 
+                    "#composer-submit-button"];
 
-            if (url.Contains("deepseek.com"))
-                return new string[] { "textarea", ".ds-message .fbb737a4", ".ds-icon-button.ds-icon-button--l.ds-icon-button--sizing-container" };
+            if (currentUrl.Contains("deepseek.com"))
+                return [
+                    "textarea[class=\"_27c9245 ds-scroll-area d96f2d2a\"][placeholder]", 
+                    ".ds-message .fbb737a4", 
+                    ".ds-icon-button.ds-icon-button--l.ds-icon-button--sizing-container" ];
+
+            if (currentUrl.Contains("doubao.com"))
+                return [
+                    "textarea[data-testid=\"chat_input_input\"][placeholder]",
+                    ".max-w-full .container-QQkdo4",
+                    "button[data-testid=\"chat_input_send_button\" ][id=\"flow-end-msg-send\"]"];
 
 
-            return new string[] { "", "","","" };
+            //其他，尝试一个初始值
+            return [
+                "textarea",
+                ".query-text-line", 
+                "button"];
         }
     }
 }

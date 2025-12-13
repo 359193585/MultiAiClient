@@ -1,0 +1,17 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- 通用阴影效果 -->
+    <DropShadowEffect x:Key="DropShadowEffect"
+                      BlurRadius="8"
+                      ShadowDepth="2"
+                      Color="#DDDDDD"
+                      Opacity="0.8"/>
+
+    <DropShadowEffect x:Key="TabShadowEffect"
+                      BlurRadius="3"
+                      ShadowDepth="1"
+                      Color="#BBBBBB"
+                      Opacity="0.5"/>
+</ResourceDictionary>
