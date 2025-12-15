@@ -1,4 +1,4 @@
-﻿/*****************************************
+﻿  /*****************************************
  *
  * 项目名称： MultiAIClient  
  * 文 件 名:  MainWindow.xaml.cs
@@ -70,14 +70,20 @@ namespace MultiAIClient
             this.MaxHeight = screenHeight;
             this.Top = 0;
             this.Left = 0;
-            this.Icon = new BitmapImage(new Uri("pack://application:,,,/Icons/MyAppIcon.ico"));
+            try
+            {
+                this.Icon = new BitmapImage(new Uri("pack://application:,,,/Icons/MyAppIcon.ico"));
+            }
+            catch { }
         }
         private async void InitializeAllTabs()
         {
-            string configPath = "config.json";
+            string exeDir = System.IO.Path.GetDirectoryName(Environment.ProcessPath!
+)!;
+            string configPath = System.IO.Path.Combine(exeDir,"config.json");
             if (!File.Exists(configPath))
             {
-                MessageBox.Show("配置文件 config.json 未找到。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"配置文件 {configPath} 未找到。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -238,6 +244,18 @@ namespace MultiAIClient
 #if DEBUG
                 // 强制禁用缓存 (仅用于调试，生产环境应移除)
                 creationOptions.AdditionalBrowserArguments = "--disable-application-cache";
+
+                // 选项1: 只禁用磁盘缓存，保留内存缓存
+                //creationOptions.AdditionalBrowserArguments = "--disk-cache-size=1";
+
+                // 选项2: 禁用HTTP缓存，但保留其他缓存
+                 //creationOptions.AdditionalBrowserArguments = "--disable-http-cache";
+
+                // 选项3: 设置极短的缓存时间
+                 //creationOptions.AdditionalBrowserArguments = "--aggressive-cache-discard";
+
+                // 选项4: 禁用特定类型的缓存
+                 //creationOptions.AdditionalBrowserArguments = "--disable-features=VizDisplayCompositor";
 #endif
 
                 //  创建 CoreWebView2Environment,传递给 WebView2 控件
@@ -248,6 +266,8 @@ namespace MultiAIClient
                 // 开发者模式  (仅用于调试，生产环境应移除)
                 webView.CoreWebView2.OpenDevToolsWindow();  //开发者模式
 #endif
+
+
 
                 if (webView.CoreWebView2 != null)
                 {
@@ -372,7 +392,7 @@ namespace MultiAIClient
                         await InjectCommno.InjectModule(webView);
                     }
 
-                    Debug.WriteLine("导航完成，所有脚本注入成功。");
+                    Debug.WriteLine("导航完成，脚本注入操作完成，请关注状态是否成功。");
                 }
                 catch (Exception ex)
                 {

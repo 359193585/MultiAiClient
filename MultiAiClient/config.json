@@ -1,5 +1,13 @@
 ﻿[
 
+  
+  {
+    "name": "腾讯元宝",
+    "url": "https://yuanbao.tencent.com/chat/",
+    "dataFolderName": "Data_tencent.yuanbao",
+    "iconPath": "Icons/yuanbao_logo.png"
+  },
+  
   {
     "name": "Gemini AI",
     "url": "https://gemini.google.com/app",
@@ -30,14 +38,6 @@
 
 
 
-  
-  {
-    "name": "腾讯元宝",
-    "url": "https://yuanbao.tencent.com/chat/",
-    "dataFolderName": "Data_tencent.yuanbao",
-    "iconPath": "Icons/yuanbao_logo.png"
-  },
-  
 
 
   {

@@ -42,28 +42,24 @@ if (window.__my_injected__ && window.__my_injected__.chatNavigator) {
 
         internal static string GetNextMesgageJS()
         {
-            string script = " __my_injected__.cn.n();";
-            script = "__my_injected__.chatNavigator.goToNextUserMessage();";
+            string script =  "__my_injected__.chatNavigator.goToNextUserMessage();";
             return script;
         }
 
         internal static string GetPrevMesgageJS()
         {
-            string script = " __my_injected__.cn.p();";
-            script =  "__my_injected__.chatNavigator.goToPrevUserMessage();";
+            string script =  "__my_injected__.chatNavigator.goToPrevUserMessage();";
             return script;
         }
         internal static string GetMesgCountJS()
         {
-            string script = " __my_injected__.cn.c();";
-            script = "__my_injected__.chatNavigator.messageCount();";
+            string script = "__my_injected__.chatNavigator.messageCount();";
             return script;
         }
 
         internal static string GetAllUserMessagesJS()
         {
-            string script = " __my_injected__.cn.g()";
-            script =  "__my_injected__.chatNavigator.getMesgStr()";
+            string script = "__my_injected__.chatNavigator.getMesgStr()";
             return script;
         }
 

@@ -1,0 +1,25 @@
+﻿<Project>
+	<PropertyGroup>
+		<!-- 【Debug模式】 -->
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+
+
+	</PropertyGroup>
+
+		<!-- ComInjectScripts目录下JS文件作为内容使用，
+		但不需要复制到输出目录，
+		调试时直接读取原始的文件，便于修改-->
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+		<Content Include="ComInjectScripts/**/*.js">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	
+
+  <ItemGroup>
+    <Folder Include="webview2-overrides\" />
+  </ItemGroup>
+
+
+</Project>

@@ -15,9 +15,11 @@ node_modules/
 *.sln.docstates
 .vs
 webview2-overrides/
+/MultiAiClient/MultiAIClient.csproj.bak
 
 
 # Build results
 [Dd]ebug/
 [Rr]elease/
 x64/
+

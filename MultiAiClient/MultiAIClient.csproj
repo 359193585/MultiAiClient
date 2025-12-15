@@ -1,162 +1,64 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-    <WebView2Platform>wpf</WebView2Platform>
-    <ApplicationIcon>Icons\MyAppIcon.ico</ApplicationIcon>
+	<PropertyGroup>
+
+		<!-- 公共配置-->
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationIcon>Icons\MyAppIcon.ico</ApplicationIcon>
+
+		<WebView2Platform>wpf</WebView2Platform>
+		<WebView2LoaderPreference>Static</WebView2LoaderPreference>
+		
+	
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="ComInjectScripts\snippet%253A\**" />
-    <Compile Remove="ComInjectScripts\yuanbao.tencent.com\**" />
-    <EmbeddedResource Remove="ComInjectScripts\snippet%253A\**" />
-    <EmbeddedResource Remove="ComInjectScripts\yuanbao.tencent.com\**" />
-    <None Remove="ComInjectScripts\snippet%253A\**" />
-    <None Remove="ComInjectScripts\yuanbao.tencent.com\**" />
-    <Page Remove="ComInjectScripts\snippet%253A\**" />
-    <Page Remove="ComInjectScripts\yuanbao.tencent.com\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%2525235" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252351" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252352" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252353" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252354" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252355" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252356" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252357" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252358" />
-    <None Remove="ComInjectScripts\snippet%253A\%2525E8%252584%25259A%2525E6%25259C%2525AC%2525E4%2525BB%2525A3%2525E7%2525A0%252581%2525E7%252589%252587%2525E6%2525AE%2525B5%252520%25252359" />
-  </ItemGroup>
+  
+		
+<!-- 包含不同的项目配置 -->
+<Import Project="MultiAIClient.csproj.Debug.props" Condition="'$(Configuration)' == 'Debug'" />
+<Import Project="MultiAIClient.csproj.Release.props" Condition="'$(Configuration)' == 'Release'" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3595.46" />
   </ItemGroup>
+	
 
+	
+	
   <ItemGroup>
-    <Content Include="Icons\MyAppIcon.ico">
+    <!-- 图标资源始终复制到发布目录 但不嵌入-->
+    <None Update="Icons\**\*.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </None>
 
-  
-
-  <ItemGroup>
+    <!-- 配置文件始终复制到发布目录 -->
     <None Update="config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\chartgpt_logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\deepseek_logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\doubao_logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\gemini_logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\img_665ca1d0dbc2c.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\logo.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\logo128.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\logo64.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\MyAppIcon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\yuanbao_logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Icons\yuanqi_logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </None>
   </ItemGroup>
-
-
-
-
-
-
-	<!-- 【Debug模式】将Scripts目录下所有原始JS文件复制到输出目录 -->
-	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
-		<Content Include="ComInjectScripts/**/*.js">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	
+	
+	<!--  程序图标是 WPF Resource -->
+	<ItemGroup>
+		<Content Include="Icons\MyAppIcon.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
 	</ItemGroup>
-
-
-	<!-- 【Release模式】定义目标，在构建后自动混淆所有JS文件并嵌入 -->
-	<Target Name="ObfuscateAllJavaScript" BeforeTargets="BeforeBuild;CoreCompile" Condition="'$(Configuration)' == 'Release'">
-
-		<!-- 1. 查找所有原始JS文件,并排除可能已混淆的文件 -->
-		<ItemGroup>
-			<OriginalJsFiles Include="ComInjectScripts\**\*.js" Exclude="ComInjectScripts\**\*.obfuscated.js" />
-		</ItemGroup>
-
-		<!-- 2. 为每个原始文件生成对应的混淆后文件路径（保存在obfuscated子目录） -->
-		<ItemGroup>
-			<ObfuscatedJsFiles Include="@(OriginalJsFiles -> 'ComInjectScripts\obfuscated\%(RecursiveDir)%(Filename).obfuscated.js')" />
-		</ItemGroup>
-		
-		<!-- 确保输出目录存在 -->
-		<MakeDir Directories="@(ObfuscatedJsFiles -> '%(RootDir)%(Directory)')" />
-		
-		<!-- 3. 执行混淆命令（使用javascript-obfuscator） -->
-
-			<!-- 使用批处理元数据执行混淆命令 -->
-			<Exec Command="npx javascript-obfuscator &quot;%(OriginalJsFiles.Identity)&quot; --output &quot;ComInjectScripts\obfuscated\%(RecursiveDir)%(Filename).obfuscated.js&quot; --compact true --self-defending true " WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'@(OriginalJsFiles)' != ''" />
-	 
-
-		<!-- 4. 将生成的所有混淆后文件添加为嵌入式资源 -->
-        <ItemGroup Condition="'@(ObfuscatedJsFiles)' != ''">
-		    <EmbeddedResource Include="@(ObfuscatedJsFiles)" />
-		</ItemGroup>
-		
-	</Target>
 	
 	
-	<Target Name="DebugObfuscation" AfterTargets="Build">
-		<Message Text="原始JS文件: @(OriginalJsFiles)" Importance="high" />
-		<Message Text="混淆后文件: @(ObfuscatedJsFiles)" Importance="high" />
-		<Message Text="当前目录: $(MSBuildProjectDirectory)" Importance="high" />
-	</Target>
-	
-	
-	<!-- 确保Release模式下不复制原始JS文件 -->
-	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<Content Remove="ComInjectScripts/**/*.js" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Remove="ComInjectScripts\snippet%253A\**" />
-	  <Content Remove="ComInjectScripts\yuanbao.tencent.com\**" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="webview2-overrides\" />
-	</ItemGroup>
-
-
-
-
+  <ItemGroup>
+    <Folder Include="webview2-overrides\" />
+  </ItemGroup>
 
 
 </Project>
+

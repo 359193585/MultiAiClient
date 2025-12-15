@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="我的多 AI 客户端"
-        Icon="Icons/MyAppIcon.ico"
         ShowInTaskbar="True"
         MinHeight="400"
         Height="1440"
