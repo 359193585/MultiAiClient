@@ -17,17 +17,19 @@
 *********************************************/
 
 using Microsoft.Web.WebView2.Core;
+using MultiAIClient.MultiUrlInject;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using MultiAIClient.MultiUrlInject;
 
 
 namespace MultiAIClient
@@ -61,9 +63,13 @@ namespace MultiAIClient
         private Dictionary<TabItem, WebView2> _tabWebViewMapping = [];
         // 状态指示器字典
         private Dictionary<TabItem, Ellipse> _statusIndicators = new Dictionary<TabItem, Ellipse>();
+
+     
+
         public MainWindow()
         {
             InitializeComponent();
+            this.Loaded += Window_Loaded;
             InitializeAllTabs();
             double screenHeight = SystemParameters.WorkArea.Height;
             this.Height = screenHeight;
@@ -76,11 +82,12 @@ namespace MultiAIClient
             }
             catch { }
         }
+       
         private async void InitializeAllTabs()
         {
             string exeDir = System.IO.Path.GetDirectoryName(Environment.ProcessPath!
 )!;
-            string configPath = System.IO.Path.Combine(exeDir,"config.json");
+            string configPath = System.IO.Path.Combine(exeDir, "config.json");
             if (!File.Exists(configPath))
             {
                 MessageBox.Show($"配置文件 {configPath} 未找到。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -249,17 +256,17 @@ namespace MultiAIClient
                 //creationOptions.AdditionalBrowserArguments = "--disk-cache-size=1";
 
                 // 选项2: 禁用HTTP缓存，但保留其他缓存
-                 //creationOptions.AdditionalBrowserArguments = "--disable-http-cache";
+                //creationOptions.AdditionalBrowserArguments = "--disable-http-cache";
 
                 // 选项3: 设置极短的缓存时间
-                 //creationOptions.AdditionalBrowserArguments = "--aggressive-cache-discard";
+                //creationOptions.AdditionalBrowserArguments = "--aggressive-cache-discard";
 
                 // 选项4: 禁用特定类型的缓存
-                 //creationOptions.AdditionalBrowserArguments = "--disable-features=VizDisplayCompositor";
+                //creationOptions.AdditionalBrowserArguments = "--disable-features=VizDisplayCompositor";
 #endif
 
                 //  创建 CoreWebView2Environment,传递给 WebView2 控件
-                CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath,creationOptions);
+                CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath, creationOptions);
                 await webView.EnsureCoreWebView2Async(environment);
 
 #if DEBUG
@@ -423,7 +430,7 @@ namespace MultiAIClient
                             contextMenu.PlacementTarget = hitTabItem;
                             contextMenu.IsOpen = true;
                         }
-                        e.Handled = true; 
+                        e.Handled = true;
                     }
                 }
             }
@@ -442,7 +449,7 @@ namespace MultiAIClient
         {
             WebView2? webView2;
             GetWebViewObject(sender, out webView2);
-            if (webView2==null)
+            if (webView2 == null)
             {
                 return;
             }
@@ -498,14 +505,14 @@ namespace MultiAIClient
                     // 确保WebView2核心组件已加载
                     if (targetWebView?.CoreWebView2 == null)
                     {
-                        continue; 
+                        continue;
                     }
                     await InjectTextToWebview(inputText, targetWebView);
                 }
             }
             // 清空主输入框
-            if(checkBoxClean.IsChecked == true) UniversalInputTextBox.Clear();
-            
+            if (checkBoxClean.IsChecked == true) UniversalInputTextBox.Clear();
+
         }
 
         private static async Task InjectTextToWebview(string inputText, WebView2 targetWebView)
@@ -539,7 +546,7 @@ namespace MultiAIClient
                     //豆包AI
                     await InjectCommno.SubmitQuestion(targetWebView, inputText);
                 }
-                else 
+                else
                 {
                     //其他任意网站
                     await InjectCommno.SubmitQuestion(targetWebView, inputText);
@@ -555,7 +562,7 @@ namespace MultiAIClient
 
         private async void ButtonNextMesg_Click(object sender, RoutedEventArgs e)
         {
-            mesgCount.Content  = await IndexButtonClick(Scripts.GetNextMesgageJS());
+            mesgCount.Content = await IndexButtonClick(Scripts.GetNextMesgageJS());
         }
 
         private async void ButtonPrevMesg_Click(object sender, RoutedEventArgs e)
@@ -571,15 +578,15 @@ namespace MultiAIClient
                 MessageBox.Show("没有激活的页签", "提醒", MessageBoxButton.OK, MessageBoxImage.Information);
                 return "";
             }
-            await Scripts.RunInjectScript(targetWebView, command,"定位到提问");
+            await Scripts.RunInjectScript(targetWebView, command, "定位到提问");
             string MesgCount = await targetWebView.CoreWebView2.ExecuteScriptAsync(Scripts.GetMesgCountJS());//返回问题定位和数量,如：1/21
-            return MesgCount.Trim('\"'); 
+            return MesgCount.Trim('\"');
         }
 
         // 获取当前激活的页签和WebView2实例
         private (TabItem? tabItem, WebView2? webView, string tabName) GetActiveTabInfo()
         {
-            var activeTabItem = AIAggregatorTabs.SelectedItem as TabItem; 
+            var activeTabItem = AIAggregatorTabs.SelectedItem as TabItem;
             if (activeTabItem == null)
             {
                 return (null, null, "未找到激活页签");
@@ -616,7 +623,7 @@ namespace MultiAIClient
         {
             WebView2? webView2;
             GetWebViewObject(sender, out webView2);
-            if (webView2==null)
+            if (webView2 == null)
             {
                 return;
             }
@@ -632,7 +639,7 @@ namespace MultiAIClient
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"在浏览器中打开失败: {ex.Message}","警告",MessageBoxButton.OK,MessageBoxImage.Warning);
+                MessageBox.Show($"在浏览器中打开失败: {ex.Message}", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
         }
@@ -669,11 +676,11 @@ namespace MultiAIClient
 
         private async void ButtonExportMesg_Click(object sender, RoutedEventArgs e)
         {
-            (List<string> messages,string url) = await GetAllQuestions();
-            string exportedFilePath = new MessageExporter().ExportMessagesToFile(messages,url, "webview_messages");
+            (List<string> messages, string url) = await GetAllQuestions();
+            string exportedFilePath = new MessageExporter().ExportMessagesToFile(messages, url, "webview_messages");
         }
 
-        private async Task<(List<string> message ,string url)>GetAllQuestions()
+        private async Task<(List<string> message, string url)> GetAllQuestions()
         {
             var (tabItem, targetWebView, tabName) = GetActiveTabInfo();
             if (targetWebView == null)
@@ -704,7 +711,41 @@ namespace MultiAIClient
             }
             return (new List<string>(), string.Empty);
         }
-    }
 
-   
+        #region 引入SetWindowPos函数，空值窗口置顶
+        [DllImport("user32.dll")]
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        // 窗体置顶常用的参数值
+        static readonly IntPtr HWND_TOPMOST = new IntPtr(-1); // 置顶
+        static readonly IntPtr HWND_NOTTOPMOST = new IntPtr(-2); // 置顶
+        private const uint SWP_NOSIZE = 0x0001; // 不改变窗口大小
+        private const uint SWP_NOMOVE = 0x0002; // 不改变窗口位置
+        private const uint SWP_SHOWWINDOW = 0x0040; // 显示窗口
+        private IntPtr GetWindowHandle()
+        {
+            // 获取窗口句柄
+            return new WindowInteropHelper(this).Handle;
+        }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            TopMostToggle.IsChecked = false;
+        }
+        private void TopMostToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (TopMostToggle.IsChecked == true)
+            {
+                IntPtr handle = GetWindowHandle();
+                SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+            }
+            else
+            {
+                IntPtr handle = GetWindowHandle();
+                SetWindowPos(handle, HWND_NOTTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+            }
+
+        }
+        #endregion
+
+    }
 }

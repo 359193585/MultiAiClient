@@ -18,8 +18,8 @@
             <MenuItem Header="浏览器打开" Click="OpenInBrowserMenuItem_Click"/>
             <!-- 可以继续添加其他菜单项，如"关闭页签"、"关闭其他页签"等 -->
         </ContextMenu>
-        
-    
+
+
 
     </Window.Resources>
 
@@ -36,7 +36,7 @@
         <TabControl Grid.Row="0" 
                     Style="{StaticResource FlatTabControlStyle}"
                     Name="AIAggregatorTabs"/>
-                    <!--ItemContainerStyle="{StaticResource FlatTabItemStyle}"-->
+        <!--ItemContainerStyle="{StaticResource FlatTabItemStyle}"-->
 
         <GridSplitter  Grid.Row="1" 
         Height="5"           
@@ -70,12 +70,12 @@
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  VerticalScrollBarVisibility="Auto"
-                                 FontSize="14"/>  
+                                 FontSize="14"/>
                     </Grid>
                 </Border>
-                
-                
-                
+
+
+
                 <!-- 输入框右边的button列 -->
                 <Border Grid.Column="1" Background="{StaticResource Brush.Background.Main}" 
                         BorderBrush="{StaticResource Brush.Border.Light}" BorderThickness="0,0,0,0" Padding="1">
@@ -93,38 +93,70 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="6*"/>
-                                    <RowDefinition Height="3*"/>
-                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="6*"/>
                                 </Grid.RowDefinitions>
-                                
+
                                 <Button Grid.Row="0" 
                                         x:Name="UniversalSendButton" 
                                         Content="发送" 
                                         Margin="5,0,0,0" Padding="0,5" 
                                         Style="{StaticResource Button.Rounded.Primary}"
                                         Click="UniversalSendButton_Click"/>
-                                
-                                <CheckBox Grid.Row="1" 
-                                          x:Name="checkBoxSendOnly"  
-                                          IsChecked="False" 
-                                          Content="只发本窗口" 
-                                          VerticalAlignment="Center" 
-                                          HorizontalAlignment="Center"
-                                           Padding="3,3"
-                                          VerticalContentAlignment="Center" Background="#FFC3C9DA" 
-                                          Foreground="Black" FontSize="14"/>
-                                
-                                
-                                <CheckBox  Grid.Row="2" 
-                                           x:Name="checkBoxClean"
-                                           IsChecked="True"  
-                                           Content="发送后清空" 
-                                            VerticalAlignment="Center" 
-                                           HorizontalAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                            Padding="3,3"
-                                           Background="#FFC3C9DA" 
-                                           Foreground="Black" FontSize="14"/>
+
+                                <Grid Grid.Row="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="8*"/>
+                                            <ColumnDefinition Width="4*"/>
+                                        </Grid.ColumnDefinitions>
+                                       
+                                        <Grid Grid.Column="0">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+                                         
+                                            <CheckBox Grid.Row="0" 
+          x:Name="checkBoxSendOnly"  
+          IsChecked="False" 
+          Content="只发本窗口" 
+          VerticalAlignment="Center" 
+          HorizontalAlignment="Center"
+           Padding="3,3"
+          VerticalContentAlignment="Center" Background="#FFC3C9DA" 
+          Foreground="Black" FontSize="14"/>
+
+
+                                            <CheckBox  Grid.Row="1" 
+           x:Name="checkBoxClean"
+           IsChecked="True"  
+           Content="发送后清空" 
+            VerticalAlignment="Center" 
+           HorizontalAlignment="Center"
+           VerticalContentAlignment="Center"
+            Padding="3,3"
+           Background="#FFC3C9DA" 
+           Foreground="Black" FontSize="14"/>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid Grid.Column="1">
+                                            <ToggleButton Grid.Row="3" 
+               x:Name="TopMostToggle" 
+               Content="📌 置顶" 
+               Margin="10,10"  Padding="0,1"
+               HorizontalAlignment="Right"
+               Click="TopMostToggle_Click" />
+                                        </Grid>
+                                    </Grid>
+                                  
+
+
+                               
+
+   
+                                </Grid>
+                              
                             </Grid>
                         </Border>
 
@@ -160,7 +192,7 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        
+
                                         <Button Grid.Column="0" 
                                                 x:Name="prevMesgButton" 
                                                 Content="上一问题"
@@ -176,8 +208,8 @@
                                                 Click="ButtonNextMesg_Click" />
                                     </Grid>
                                 </Border>
-                                
-                                
+
+
                                 <Border Grid.Row="2" >
                                     <Grid>
                                         <Button  x:Name="exportMesg" 
@@ -189,10 +221,10 @@
                                 </Border>
                             </Grid>
                         </Border>
-                        
-                        
-                        
-                        
+
+
+
+
                     </Grid>
                 </Border>
 

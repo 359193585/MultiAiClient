@@ -1,6 +1,7 @@
 # Build and Object Folders
 bin/
 obj/
+publish/
 
 # Nuget packages directory
 packages/
