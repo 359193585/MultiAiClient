@@ -22,7 +22,7 @@
                 
                 <!--TabControl样式 -->
                 <ResourceDictionary Source="Styles/TabControl/TabControl.Base.xaml"/>
-                <ResourceDictionary Source="/Styles/TabControl/TabControl.Flat.xaml"/>
+                <ResourceDictionary Source="Styles/TabControl/TabControl.Flat.xaml"/>
                 <ResourceDictionary Source="Styles/TabControl/TabItem.Flat.xaml"/>
                 <ResourceDictionary Source="Styles/TabControl/TabItem.Card.xaml"/>
                 <ResourceDictionary Source="Styles/TabControl/TabItem.Browser.xaml"/>

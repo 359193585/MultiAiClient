@@ -20,6 +20,12 @@
 <!-- 包含不同的项目配置 -->
 <Import Project="MultiAIClient.csproj.Debug.props" Condition="'$(Configuration)' == 'Debug'" />
 <Import Project="MultiAIClient.csproj.Release.props" Condition="'$(Configuration)' == 'Release'" />
+<ItemGroup>
+  <Compile Remove="%27bin\**" />
+  <EmbeddedResource Remove="%27bin\**" />
+  <None Remove="%27bin\**" />
+  <Page Remove="%27bin\**" />
+</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3595.46" />

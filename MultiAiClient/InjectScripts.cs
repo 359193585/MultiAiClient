@@ -51,6 +51,17 @@ if (window.__my_injected__ && window.__my_injected__.chatNavigator) {
             string script =  "__my_injected__.chatNavigator.goToPrevUserMessage();";
             return script;
         }
+        internal static string GetTopMesgageJS()
+        {
+            string script = "__my_injected__.chatNavigator.goToTopUserMessage();";
+            return script;
+        }
+        internal static string GetBottomMesgageJS()
+        {
+            string script = "__my_injected__.chatNavigator.goToBottomUserMessage();";
+            return script;
+        }
+
         internal static string GetMesgCountJS()
         {
             string script = "__my_injected__.chatNavigator.messageCount();";

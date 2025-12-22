@@ -66,6 +66,21 @@ if (window.__my_injected__.chatNavigator) {
         return true;
     }
 
+    // 4. 跳到最新的问题
+    function goToBottomUserMessage() {
+        const msgs = getUserMessages();
+        if (!msgs.length) return;
+        scrollToMessage(msgs.length-1);
+        return true;
+    }
+
+    // 5. 跳到最早的问题
+    function goToTopUserMessage() {
+        const msgs = getUserMessages();
+        if (!msgs.length) return;
+        scrollToMessage(0);
+        return true;
+    }
     function getMesgStr() {
         const msgs = getUserMessages();
         const messageContents = msgs.map(msg => msg.textContent.trim());
@@ -77,6 +92,8 @@ if (window.__my_injected__.chatNavigator) {
         init,
         goToPrevUserMessage,
         goToNextUserMessage,
+        goToTopUserMessage,
+        goToBottomUserMessage,
         getMesgStr,
         messageCount: () => state.messageCount,
         // 可选：获取当前 index，用于 UI 同步

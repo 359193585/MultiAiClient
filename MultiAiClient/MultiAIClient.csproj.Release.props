@@ -3,27 +3,38 @@
 		<!-- 【Release模式】 明确声明没有 DEBUG -->
 		<DefineConstants>TRACE</DefineConstants>
 
+		<!-- 版本号 -->
+		<Version>1.2.0.3</Version>
+		<FileVersion>1.2.0.3</FileVersion>
+
+		<!-- 输出目录 -->
+		<PublishDir>bin\release\MultiAiClient_single</PublishDir>
+		
+		<!-- 运行时标识符 (RID) -->
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<SelfContained>true</SelfContained>
+		<!-- 是否包括 win-x64 子目录 -->
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 		
 		<!-- 输出单执行文件 -->
 		<PublishSingleFile>true</PublishSingleFile>
 		
 		<!-- 不允许 DLL 解压到同级目录 -->
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<SelfContained>true</SelfContained>
 		
 		<!-- 不生成 *.dll,.config 等 -->
 		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
 
 		<Optimize>False</Optimize>
 		
-		<!--win-x64子目录-->
-		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 		
 		<!--指定只包含英语资源，减少其他语言文件夹-->
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 
-		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+		<!-- 发布时不生成pdb文件 -->
+		<!--<DebugType>none</DebugType>-->
+		<!--<DebugSymbols>false</DebugSymbols>-->
+		
 		
 	</PropertyGroup>
 
@@ -59,7 +70,7 @@
 		
 		<!-- 4. 执行混淆命令（使用javascript-obfuscator）
 		使用批处理元数据执行混淆命令 -->
-		<Exec Command="npx javascript-obfuscator &quot;%(OriginalJsFiles.Identity)&quot; --output &quot;ComInjectScripts\obfuscated\%(RecursiveDir)%(Filename).obfuscated.js&quot; --compact true --self-defending true " 
+		<Exec Command="npx javascript-obfuscator &quot;%(OriginalJsFiles.Identity)&quot; --output &quot;ComInjectScripts\obfuscated\%(RecursiveDir)%(Filename).obfuscated.js&quot; --compact true --self-defending true --disable-console-output true" 
 			  WorkingDirectory="$(MSBuildProjectDirectory)" 
 			  Condition="'@(OriginalJsFiles)' != ''" />
 	 
@@ -87,15 +98,11 @@
 	</Target>
 
 
+
+	<!-- 定义在Release模式下构建后自动发布的目标 -->
+	<Target Name="AutoPublishOnReleaseBuild" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
+		<Message Importance="high" Text="开始自动发布流程..." />
+		<Exec Command="dotnet publish -c Release --no-build" />
+	</Target>
 </Project>
 
-
-
-
-<!-- 以下代码是提示用户如何编译
-	第一次验证（不 publish）:
-dotnet build -c Release
-
-	正式发布:
-dotnet publish -c Release -r win-x64 &#45;&#45;no-restore -o .\MultiAiClient\bin\release\MultiAiClient_single
--->

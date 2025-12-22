@@ -20,6 +20,7 @@ using Microsoft.Web.WebView2.Core;
 using MultiAIClient.MultiUrlInject;
 using System.Diagnostics;
 using System.IO;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -64,7 +65,7 @@ namespace MultiAIClient
         // 状态指示器字典
         private Dictionary<TabItem, Ellipse> _statusIndicators = new Dictionary<TabItem, Ellipse>();
 
-     
+
 
         public MainWindow()
         {
@@ -82,7 +83,7 @@ namespace MultiAIClient
             }
             catch { }
         }
-       
+
         private async void InitializeAllTabs()
         {
             string exeDir = System.IO.Path.GetDirectoryName(Environment.ProcessPath!
@@ -113,6 +114,7 @@ namespace MultiAIClient
                     {
                         Name = $"{service.Name.Replace(" ", "")}WebView" // 动态命名
                     };
+                    webView.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
 
                     // 创建 TabItem
                     // 创建 StackPanel 容器（用于水平排列图片和文字）
@@ -204,140 +206,83 @@ namespace MultiAIClient
                 }
             }
         }
-
-        private static Image LoadIcon(AiServiceConfig service)
+        
+        private void OnLoadInBrowserMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            using (var stream = new FileStream(service.IconPath, FileMode.Open, FileAccess.Read))
+            WebView2? webView2;
+            GetWebViewObject(sender, out webView2);
+            if (webView2 == null)
             {
-                bitmapImage.StreamSource = stream;
-                bitmapImage.EndInit();
+                return;
             }
-            var image = new Image
-            {
-                Source = bitmapImage,
-                Width = 16,
-                Height = 16,
-                Margin = new Thickness(0, 0, 5, 0),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            return image;
-        }
-
-        /// <summary>
-        ///  WebView2 初始化webview，配置独立的用户数据文件夹
-        /// </summary>
-        private async Task InitializeWebViewWithEnvironment(
-            WebView2 webView,
-            string url,
-            string serviceName,
-            string dataFolderName,
-            TabItem tabItem)
-        {
+            // url 浏览器打开
             try
             {
-                //  构造唯一的、隔离的用户数据文件夹路径
-                string userDataPath = System.IO.Path.Combine(AppDataPath, dataFolderName);
-                if (!Directory.Exists(userDataPath))
+                ProcessStartInfo psi = new ProcessStartInfo
                 {
-                    Directory.CreateDirectory(userDataPath);
-                }
-                UpdateTabStatus(tabItem, TabStatus.NotLoaded);
-
-                // 创建 EnvironmentOptions
-                var creationOptions = new CoreWebView2EnvironmentOptions();
-#if DEBUG
-                // 强制禁用缓存 (仅用于调试，生产环境应移除)
-                creationOptions.AdditionalBrowserArguments = "--disable-application-cache";
-
-                // 选项1: 只禁用磁盘缓存，保留内存缓存
-                //creationOptions.AdditionalBrowserArguments = "--disk-cache-size=1";
-
-                // 选项2: 禁用HTTP缓存，但保留其他缓存
-                //creationOptions.AdditionalBrowserArguments = "--disable-http-cache";
-
-                // 选项3: 设置极短的缓存时间
-                //creationOptions.AdditionalBrowserArguments = "--aggressive-cache-discard";
-
-                // 选项4: 禁用特定类型的缓存
-                //creationOptions.AdditionalBrowserArguments = "--disable-features=VizDisplayCompositor";
-#endif
-
-                //  创建 CoreWebView2Environment,传递给 WebView2 控件
-                CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath, creationOptions);
-                await webView.EnsureCoreWebView2Async(environment);
-
-#if DEBUG
-                // 开发者模式  (仅用于调试，生产环境应移除)
-                webView.CoreWebView2.OpenDevToolsWindow();  //开发者模式
-#endif
-
-
-
-                if (webView.CoreWebView2 != null)
-                {
-                    webView.Source = new Uri(url);
-                    Console.WriteLine($"{serviceName} 初始化成功，数据路径: {userDataPath}");
-                    // 订阅导航开始事件（显示加载中）
-                    webView.CoreWebView2.NavigationStarting += (sender, e) =>
-                    {
-                        UpdateTabStatus(tabItem, TabStatus.Loading);
-                    };
-                }
-                Console.WriteLine($"{serviceName} 环境预初始化成功，数据路径: {userDataPath}");
-                webView.NavigationCompleted += WebView2_NavigationCompleted;
-
+                    FileName = webView2.Source.ToString(),
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"初始化 {serviceName} 失败: {ex.Message}");
-                UpdateTabStatus(tabItem, TabStatus.Error);
+                MessageBox.Show($"在浏览器中打开失败: {ex.Message}", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+        }
+
+        private void OnRefreshMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            WebView2? webView2;
+            GetWebViewObject(sender, out webView2);
+            if (webView2 == null)
+            {
+                return;
+            }
+            // 刷新页面
+            try
+            {
+                webView2.Reload();
+                mesgCount.Content = "";
+            }
+            catch { }
+        }
+        private void WebView2_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
+        {
+
+            WebView2? webView = sender as WebView2;
+            if (webView == null) return;
+            if (e.IsSuccess)
+            {
+                DenyDevToolInRelease(webView);
+                // 订阅上下文菜单请求事件
+                webView.CoreWebView2.ContextMenuRequested += WebView2_CoreWebView2_ContextMenuRequested;
             }
         }
-        public enum TabStatus
-        {
-            NotLoaded,   // 未加载 - 无指示点
-            Loading,     // 加载中 - 黄色
-            Loaded,      // 加载完成 - 绿色
-            Error        // 加载错误 - 红色
-        }
 
-        // 更新页签状态的方法
-        private void UpdateTabStatus(TabItem tabItem, TabStatus status)
+        //  上下文菜单请求事件
+        private void WebView2_CoreWebView2_ContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs e)
         {
-            // 确保在UI线程上执行
-            Dispatcher.Invoke(() =>
+#if RELEASE
+            try
             {
-                if (_statusIndicators.TryGetValue(tabItem, out var statusIndicator) && statusIndicator != null)
+                var menuItems = e.MenuItems;
+
+                // 查找名为 "inspectElement" 的“检查”元素菜单项
+                var inspectItem = menuItems.FirstOrDefault(item => item.Name == "inspectElement");
+
+                if (inspectItem != null)
                 {
-                    switch (status)
-                    {
-                        case TabStatus.NotLoaded:
-                            statusIndicator.Visibility = Visibility.Collapsed;
-                            break;
-                        case TabStatus.Loading:
-                            statusIndicator.Fill = Brushes.Yellow;
-                            statusIndicator.Visibility = Visibility.Visible;
-                            statusIndicator.ToolTip = "加载中...";
-                            break;
-                        case TabStatus.Loaded:
-                            statusIndicator.Fill = Brushes.LimeGreen;
-                            statusIndicator.Visibility = Visibility.Visible;
-                            statusIndicator.ToolTip = "已加载";
-                            break;
-                        case TabStatus.Error:
-                            statusIndicator.Fill = Brushes.Red;
-                            statusIndicator.Visibility = Visibility.Visible;
-                            statusIndicator.ToolTip = "加载失败";
-                            break;
-                    }
+                    menuItems.Remove(inspectItem);
                 }
-            });
+            }
+            catch { }
+           
+#endif
         }
 
-        //页面加载完成，进行注入脚本，修改状态指示
+        //页面加载完成，进行注入脚本，修改状态指示等
         private async void WebView2_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
             WebView2? webView = sender as WebView2;
@@ -351,6 +296,7 @@ namespace MultiAIClient
                 {
                     UpdateTabStatus(activeTabItem, TabStatus.Loaded); //完成，显示绿点
                 }
+
                 string currentUrl = webView.Source?.ToString().ToLower() ?? "";
 
                 // 不同的URL，注入不同的脚本
@@ -407,7 +353,157 @@ namespace MultiAIClient
                 }
             }
         }
+        private static Image LoadIcon(AiServiceConfig service)
+        {
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            using (var stream = new FileStream(service.IconPath, FileMode.Open, FileAccess.Read))
+            {
+                bitmapImage.StreamSource = stream;
+                bitmapImage.EndInit();
+            }
+            var image = new Image
+            {
+                Source = bitmapImage,
+                Width = 16,
+                Height = 16,
+                Margin = new Thickness(0, 0, 5, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            return image;
+        }
 
+        /// <summary>
+        ///  WebView2 初始化webview，配置独立的用户数据文件夹
+        /// </summary>
+        private async Task InitializeWebViewWithEnvironment(
+            WebView2 webView,
+            string url,
+            string serviceName,
+            string dataFolderName,
+            TabItem tabItem)
+        {
+            try
+            {
+                //  构造唯一的、隔离的用户数据文件夹路径
+                string userDataPath = System.IO.Path.Combine(AppDataPath, dataFolderName);
+                if (!Directory.Exists(userDataPath))
+                {
+                    Directory.CreateDirectory(userDataPath);
+                }
+                UpdateTabStatus(tabItem, TabStatus.NotLoaded);
+
+                // 创建 EnvironmentOptions
+                var creationOptions = new CoreWebView2EnvironmentOptions();
+#if DEBUG
+                // 强制禁用缓存 (仅用于调试，生产环境应移除)
+                //creationOptions.AdditionalBrowserArguments = "--disable-application-cache";
+
+                // 选项1: 只禁用磁盘缓存，保留内存缓存
+                //creationOptions.AdditionalBrowserArguments = "--disk-cache-size=1";
+
+                // 选项2: 禁用HTTP缓存，但保留其他缓存
+                //creationOptions.AdditionalBrowserArguments = "--disable-http-cache";
+
+                // 选项3: 设置极短的缓存时间
+                //creationOptions.AdditionalBrowserArguments = "--aggressive-cache-discard";
+
+                // 选项4: 禁用特定类型的缓存
+                //creationOptions.AdditionalBrowserArguments = "--disable-features=VizDisplayCompositor";
+#endif
+
+                //  创建 CoreWebView2Environment,传递给 WebView2 控件
+                CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath, creationOptions);
+                await webView.EnsureCoreWebView2Async(environment);
+
+#if DEBUG
+                // 自动打开开发者模式  (仅用于调试，生产环境应移除)
+                webView.CoreWebView2.OpenDevToolsWindow();  //开发者模式
+#endif
+
+
+
+                if (webView.CoreWebView2 != null)
+                {
+                    webView.Source = new Uri(url);
+                    Console.WriteLine($"{serviceName} 初始化成功，数据路径: {userDataPath}");
+                    // 订阅导航开始事件（显示加载中）
+                    webView.CoreWebView2.NavigationStarting += (sender, e) =>
+                    {
+                        UpdateTabStatus(tabItem, TabStatus.Loading);
+                    };
+                }
+                Console.WriteLine($"{serviceName} 环境预初始化成功，数据路径: {userDataPath}");
+                webView.NavigationCompleted += WebView2_NavigationCompleted;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"初始化 {serviceName} 失败: {ex.Message}");
+                UpdateTabStatus(tabItem, TabStatus.Error);
+            }
+        }
+
+    
+
+        public enum TabStatus
+        {
+            NotLoaded,   // 未加载 - 无指示点
+            Loading,     // 加载中 - 黄色
+            Loaded,      // 加载完成 - 绿色
+            Error        // 加载错误 - 红色
+        }
+
+        // 更新页签状态的方法
+        private void UpdateTabStatus(TabItem tabItem, TabStatus status)
+        {
+            // 确保在UI线程上执行
+            Dispatcher.Invoke(() =>
+            {
+                if (_statusIndicators.TryGetValue(tabItem, out var statusIndicator) && statusIndicator != null)
+                {
+                    switch (status)
+                    {
+                        case TabStatus.NotLoaded:
+                            statusIndicator.Visibility = Visibility.Collapsed;
+                            break;
+                        case TabStatus.Loading:
+                            statusIndicator.Fill = Brushes.Yellow;
+                            statusIndicator.Visibility = Visibility.Visible;
+                            statusIndicator.ToolTip = "加载中...";
+                            break;
+                        case TabStatus.Loaded:
+                            statusIndicator.Fill = Brushes.LimeGreen;
+                            statusIndicator.Visibility = Visibility.Visible;
+                            statusIndicator.ToolTip = "已加载";
+                            break;
+                        case TabStatus.Error:
+                            statusIndicator.Fill = Brushes.Red;
+                            statusIndicator.Visibility = Visibility.Visible;
+                            statusIndicator.ToolTip = "加载失败";
+                            break;
+                    }
+                }
+            });
+        }
+
+        private void DenyDevToolInRelease(WebView2? webView)
+        {
+#if RELEASE
+            try
+            {
+
+
+                // 禁止开发者工具，禁用默认右键菜单和浏览器快捷键
+                var settings = webView.CoreWebView2.Settings;
+                settings.AreDevToolsEnabled = false;
+                //settings.AreDefaultContextMenusEnabled = false;
+                settings.AreBrowserAcceleratorKeysEnabled = false;
+
+            } catch{ }
+#endif
+        }
         private void TabControl_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Right)
@@ -445,22 +541,7 @@ namespace MultiAIClient
             }
             return child as T;
         }
-        private void RefreshMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            WebView2? webView2;
-            GetWebViewObject(sender, out webView2);
-            if (webView2 == null)
-            {
-                return;
-            }
-            // 刷新页面
-            try
-            {
-                webView2.Reload();
-                mesgCount.Content = "";
-            }
-            catch { }
-        }
+      
         private TextBlock? FindTextBlockInStackPanel(Panel panel)
         {
             foreach (var child in panel.Children)
@@ -619,30 +700,7 @@ namespace MultiAIClient
             return "未命名页签";
         }
 
-        private void OpenInBrowserMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            WebView2? webView2;
-            GetWebViewObject(sender, out webView2);
-            if (webView2 == null)
-            {
-                return;
-            }
-            // url 浏览器打开
-            try
-            {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = webView2.Source.ToString(),
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"在浏览器中打开失败: {ex.Message}", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-
-        }
+       
 
         private bool GetWebViewObject(object sender, out WebView2? webView2)
         {
@@ -731,6 +789,8 @@ namespace MultiAIClient
 
             TopMostToggle.IsChecked = false;
         }
+
+        // 窗体置顶
         private void TopMostToggle_Click(object sender, RoutedEventArgs e)
         {
             if (TopMostToggle.IsChecked == true)
@@ -747,5 +807,14 @@ namespace MultiAIClient
         }
         #endregion
 
+        private async void ButtonBottomMesg_Click(object sender, RoutedEventArgs e)
+        {
+            mesgCount.Content = await IndexButtonClick(Scripts.GetBottomMesgageJS());
+        }
+
+        private async void ButtonTopMesg_Click(object sender, RoutedEventArgs e)
+        {
+            mesgCount.Content = await IndexButtonClick(Scripts.GetTopMesgageJS());
+        }
     }
 }
