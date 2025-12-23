@@ -1,11 +1,4 @@
 
-
-https://github.com/user-attachments/assets/b1304f08-e85b-4246-9ddd-9313fca170cb
-
-
-
-https://github.com/user-attachments/assets/54387945-7fc2-48e2-bef5-f036fbde60b4
-
 ﻿# 🤖 AI 聊天集成工具 (C# / WPF / WebView2)
 
 这是一个将多个 **Web 端 AI 聊天服务** 集成到统一界面的工具。它旨在提升您与多个 AI 同时交互的效率，并通过统一的输入和分析功能来优化您的提示词工程（Prompt Engineering）流程。
@@ -80,3 +73,4 @@ A tool that integrates multiple web-based AI chat services, allowing users to op
 The program supports locating issues quickly, tracking the number of your questions, exporting all questions, analyzing the process of your interaction with AI, and optimizing your prompts.
 Developed using C#, the WPF framework, and WebView2, the project enables page interaction through JS injection.
 
+https://github.com/user-attachments/assets/54387945-7fc2-48e2-bef5-f036fbde60b4
