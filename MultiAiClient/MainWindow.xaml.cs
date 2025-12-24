@@ -18,7 +18,9 @@
 
 using Microsoft.Web.WebView2.Core;
 using MultiAIClient.MultiUrlInject;
+using System;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
@@ -152,19 +154,8 @@ namespace MultiAIClient
 
         }
 
-        private void WebView2_CoreWebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
-        {
-        //    foreach (var service in services)
-        //    {
-        //        if (e.Uri.Contains(service.Url))
-        //        {
-        //            e.Cancel = false;
-        //            return;
-        //        }
-        //    }
-        //    e.Cancel = true;
-        //    Process.Start(new ProcessStartInfo(e.Uri) { UseShellExecute = true });
-        }
+      
+     
 
         private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -410,6 +401,9 @@ namespace MultiAIClient
                 await webView.EnsureCoreWebView2Async(environment);
                 // 订阅导航开始事件
                 webView.CoreWebView2.NavigationStarting += WebView2_CoreWebView2_NavigationStarting;
+                webView.CoreWebView2.FrameCreated += WebView2_CoreWebView2_FrameCreated;
+                webView.CoreWebView2.NewWindowRequested += WebView2_CoreWebView2_NewWindowRequested;
+
 
 #if DEBUG
                 // 自动打开开发者模式
@@ -439,7 +433,80 @@ namespace MultiAIClient
             }
         }
 
-    
+      
+        #region  url open methods
+        private void WebView2_CoreWebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            HandleNavigation(e.Uri, e);
+        }
+
+        private void WebView2_CoreWebView2_NewWindowRequested(object? sender, CoreWebView2NewWindowRequestedEventArgs e)
+        {
+            if (HandleNavigation(e.Uri, e))
+            {
+                e.Handled = true;
+            }
+        }
+        private void WebView2_CoreWebView2_FrameCreated(object? sender, CoreWebView2FrameCreatedEventArgs e)
+        {
+            CoreWebView2Frame frame = e.Frame;
+            frame.NavigationStarting += Frame_NavigationStarting;
+            frame.Destroyed += (s, args) =>
+            {
+                frame.NavigationStarting -= Frame_NavigationStarting;
+            };
+        }
+
+        private void Frame_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            HandleNavigation(e.Uri, e);
+        }
+
+        private void WebView2_CoreWebView2_FrameNavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            HandleNavigation(e.Uri, e);
+        }
+
+        private bool HandleNavigation(string navigationUrl, object eventArgs)
+        {
+            if (string.IsNullOrEmpty(navigationUrl) ||
+                navigationUrl.StartsWith("about:") ||
+                navigationUrl.StartsWith("edge:") ||
+                !(navigationUrl.StartsWith("http://") || navigationUrl.StartsWith("https://")))
+            {
+                return false;
+            }
+            if(services==null || services.Count ==0)
+            {
+                return false;
+            }
+            foreach (var service in services)
+            {
+                if (Uri.TryCreate(navigationUrl, UriKind.Absolute, out Uri? navigatingUri) &&
+                    Uri.TryCreate(service.Url, UriKind.Absolute, out Uri? allowedUri))
+                {
+                    if (navigatingUri.Host.Equals(allowedUri.Host, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+            }
+            switch (eventArgs)
+            {
+                case CoreWebView2NavigationStartingEventArgs navStartingArgs:
+                    navStartingArgs.Cancel = true; // 取消主框架导航
+                    break;
+                case CoreWebView2NewWindowRequestedEventArgs newWindowArgs:
+                    break;
+            }
+            try
+                {
+                    Process.Start(new ProcessStartInfo(navigationUrl) { UseShellExecute = true });
+                }
+                catch { }
+            return true;
+        }
+        #endregion
 
         public enum TabStatus
         {

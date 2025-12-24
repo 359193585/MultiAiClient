@@ -73,7 +73,7 @@ namespace MultiAIClient
         }
 
         private static Point _dragStartPoint;
-        private static TabItem _draggedTab;
+        private static TabItem? _draggedTab;
 
         private static void TabControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -145,6 +145,10 @@ namespace MultiAIClient
                     if (tabControl.Items[i] is TabItem item)
                     {
                         AiServiceConfig? aiService = item.Tag as AiServiceConfig;
+                        if(aiService == null)
+                        {
+                            continue;
+                        }
                         newConfig.Add(new AiServiceConfig
                         {
                             Name = aiService.Name,
@@ -174,7 +178,7 @@ namespace MultiAIClient
     }
     public static class VisualTreeHelperExtensions
     {
-        public static T FindAncestor<T>(this DependencyObject current) where T : DependencyObject
+        public static T? FindAncestor<T>(this DependencyObject current) where T : DependencyObject
         {
             while (current != null)
             {
