@@ -35,22 +35,7 @@ using System.Windows.Shapes;
 
 namespace MultiAIClient
 {
-    /// <summary>
-    /// AI 服务配置项的结构
-    /// </summary>
-    public class AiServiceConfig
-    {
-        [JsonPropertyName("name")]
-        public string Name { get; set; } = string.Empty;
-
-        [JsonPropertyName("url")]
-        public string Url { get; set; } = string.Empty;
-
-        [JsonPropertyName("dataFolderName")]
-        public string DataFolderName { get; set; } = string.Empty;
-        [JsonPropertyName("iconPath")]
-        public string IconPath { get; set; } = string.Empty;
-    }
+  
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -62,9 +47,9 @@ namespace MultiAIClient
         //private readonly string AppDataPath =  Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "MyMultiAIClientData");
 
         private Dictionary<TabItem, WebView2> _tabWebViewMapping = [];
-        // 状态指示器字典
         private Dictionary<TabItem, Ellipse> _statusIndicators = new Dictionary<TabItem, Ellipse>();
 
+        List<AiServiceConfig>? services;  // All ai url settings
 
 
         public MainWindow()
@@ -84,40 +69,24 @@ namespace MultiAIClient
             catch { }
         }
 
-        private async void InitializeAllTabs()
+        private void InitializeAllTabs()
         {
-            string exeDir = System.IO.Path.GetDirectoryName(Environment.ProcessPath!
-)!;
-            string configPath = System.IO.Path.Combine(exeDir, "config.json");
-            if (!File.Exists(configPath))
+            ConfigGetSet configGetSet = new ConfigGetSet();
+            services = configGetSet.GetConfig();
+            TabControlDragDropBehavior.ConfigFileName = configGetSet.ConfigFileName;
+
+            if (services == null || services.Count == 0)
             {
-                MessageBox.Show($"配置文件 {configPath} 未找到。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("配置文件中未找到 AI 服务配置。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
             try
             {
-                string jsonString = await File.ReadAllTextAsync(configPath);
-                List<AiServiceConfig>? services = JsonSerializer.Deserialize<List<AiServiceConfig>>(jsonString);
-
-                if (services == null || services.Count == 0)
-                {
-                    MessageBox.Show("配置文件中未找到 AI 服务配置。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                // 创建 TabItem 和 WebView2 控件
                 foreach (var service in services)
                 {
-                    // 创建 WebView2 控件实例
-                    var webView = new WebView2()
-                    {
-                        Name = $"{service.Name.Replace(" ", "")}WebView" // 动态命名
-                    };
-                    webView.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
-
-                    // 创建 TabItem
-                    // 创建 StackPanel 容器（用于水平排列图片和文字）
+                   
+                    // 1 创建 TabItem
+                    // TabItem 标题是StackPanel容器，有水平排列的图片和文字）
                     var stackPanel = new StackPanel { Orientation = Orientation.Horizontal };
                     if (File.Exists(service.IconPath))
                     {
@@ -145,13 +114,21 @@ namespace MultiAIClient
                     };
                     stackPanel.Children.Add(statusIndicator);
 
+                    // 2 创建 WebView2 控件实例
+                    var webView = new WebView2()
+                    {
+                        Name = $"{service.Name.Replace(" ", "")}WebView" // 动态命名
+                    };
+                    webView.CoreWebView2InitializationCompleted += WebView2_CoreWebView2InitializationCompleted;
+
                     var tabItem = new TabItem()
                     {
                         Header = stackPanel,
                         Content = webView,
                         Tag = service
                     };
-                    tabItem.ContextMenu = (ContextMenu)this.FindResource("TabItemContextMenu");
+
+                    tabItem.ContextMenu = (ContextMenu)this.FindResource("TabItemContextMenu");//右键菜单
                     _tabWebViewMapping.Add(tabItem, webView);
                     _statusIndicators.Add(tabItem, statusIndicator);
 
@@ -173,6 +150,20 @@ namespace MultiAIClient
                 MessageBox.Show($"加载或初始化服务失败: {ex.Message}", "严重错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+        }
+
+        private void WebView2_CoreWebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+        //    foreach (var service in services)
+        //    {
+        //        if (e.Uri.Contains(service.Url))
+        //        {
+        //            e.Cancel = false;
+        //            return;
+        //        }
+        //    }
+        //    e.Cancel = true;
+        //    Process.Start(new ProcessStartInfo(e.Uri) { UseShellExecute = true });
         }
 
         private async void OnTabSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -258,6 +249,7 @@ namespace MultiAIClient
                 DenyDevToolInRelease(webView);
                 // 订阅上下文菜单请求事件
                 webView.CoreWebView2.ContextMenuRequested += WebView2_CoreWebView2_ContextMenuRequested;
+              
             }
         }
 
@@ -416,10 +408,12 @@ namespace MultiAIClient
                 //  创建 CoreWebView2Environment,传递给 WebView2 控件
                 CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath, creationOptions);
                 await webView.EnsureCoreWebView2Async(environment);
+                // 订阅导航开始事件
+                webView.CoreWebView2.NavigationStarting += WebView2_CoreWebView2_NavigationStarting;
 
 #if DEBUG
-                // 自动打开开发者模式  (仅用于调试，生产环境应移除)
-                webView.CoreWebView2.OpenDevToolsWindow();  //开发者模式
+                // 自动打开开发者模式
+                //webView.CoreWebView2.OpenDevToolsWindow(); 
 #endif
 
 

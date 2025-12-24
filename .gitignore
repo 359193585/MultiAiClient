@@ -1,7 +1,7 @@
 # Build and Object Folders
 bin/
 obj/
-publish/
+
 
 # Nuget packages directory
 packages/
@@ -17,6 +17,9 @@ node_modules/
 .vs
 webview2-overrides/
 /MultiAiClient/MultiAIClient.csproj.bak
+publish/
+ProjectManage/
+
 
 
 # Build results

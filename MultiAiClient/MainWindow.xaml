@@ -30,10 +30,12 @@
             <RowDefinition Height="300" MinHeight="300" MaxHeight="700"/>
         </Grid.RowDefinitions>
 
-        <!-- 第1行：  tabcontrol 容器 区域-->
+        <!-- 第1行： TabControl 容器区域 -->
         <TabControl Grid.Row="0" 
+                    Name="AIAggregatorTabs"
+                    local:TabControlDragDropBehavior.IsDragDropEnabled="True" 
                     Style="{StaticResource FlatTabControlStyle}"
-                    Name="AIAggregatorTabs"/>
+                    />
         <!--ItemContainerStyle="{StaticResource FlatTabItemStyle}"-->
 
         <GridSplitter  Grid.Row="1" 
@@ -47,7 +49,7 @@
 
         <!-- 第2行：统一输入区域和发送控制容器 -->
         <Border Grid.Row="2" Background="{StaticResource Brush.Background.Main}" 
-                BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10">
+                BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10" Margin="0,0,0,-19">
             
             <!-- 拆分为左右两列-->
             <Grid x:Name="bottom">
@@ -165,9 +167,9 @@
                         <Border Grid.Row="1"  BorderBrush="{StaticResource Brush.Border.Light}" BorderThickness="0,0,1,2" Padding="1">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="3*"/>
                                 </Grid.RowDefinitions>
 
                                 <Border Grid.Row="0" >
@@ -208,6 +210,7 @@ Click="ButtonTopMesg_Click"/>
                       Margin="0,10,5,5" Padding="5,5" 
                       Style="{StaticResource Button.Rounded.Secondary}"
                      Click="ButtonNextMesg_Click" />
+                                        
                                         <Button Grid.Column="3" 
 x:Name="bottomMesgButton" 
 Content="》"
@@ -222,7 +225,7 @@ Click="ButtonBottomMesg_Click"/>
                                     <Grid>
                                         <Button  x:Name="exportMesg" 
                       Content="导出全部问题"
-                      Margin="5,5,5,10" Padding="15,5" 
+                      Margin="10,1,10,15" Padding="0,5" 
                       Style="{StaticResource Button.Rounded.Secondary}"
                       Click="ButtonExportMesg_Click" />
                                     </Grid>
