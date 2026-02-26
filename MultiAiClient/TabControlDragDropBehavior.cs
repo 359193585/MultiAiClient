@@ -114,15 +114,9 @@ namespace MultiAIClient
 
                 if (sourceIndex != targetIndex && sourceIndex >= 0 && targetIndex >= 0)
                 {
-                    // 移动项
                     tabControl.Items.RemoveAt(sourceIndex);
                     tabControl.Items.Insert(targetIndex, sourceItem);
                     sourceItem.IsSelected = true;
-
-                    System.Diagnostics.Debug.WriteLine($"[OnDrop] 移动 TabItem: {sourceIndex} -> {targetIndex}");
-                    System.Diagnostics.Debug.WriteLine($"  移动后 Content 类型: {sourceItem.Content?.GetType().Name}");
-
-                    // 保存新顺序到JSON
                     SaveTabOrder(tabControl);
                 }
             }

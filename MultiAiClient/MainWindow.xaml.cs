@@ -17,6 +17,7 @@
 *********************************************/
 
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Win32;
 using MultiAIClient.MultiUrlInject;
 using System;
 using System.Diagnostics;
@@ -58,12 +59,14 @@ namespace MultiAIClient
         {
             InitializeComponent();
             this.Loaded += Window_Loaded;
+            SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
             InitializeAllTabs();
             double screenHeight = SystemParameters.WorkArea.Height;
             this.Height = screenHeight;
-            this.MaxHeight = screenHeight;
             this.Top = 0;
             this.Left = 0;
+
+
             try
             {
                 this.Icon = new BitmapImage(new Uri("pack://application:,,,/Icons/MyAppIcon.ico"));
@@ -71,6 +74,22 @@ namespace MultiAIClient
             catch { }
         }
 
+        private void SystemEvents_DisplaySettingsChanged(object? sender, EventArgs e)
+        {
+            foreach (var webViewPair in _tabWebViewMapping)
+            {
+                WebView2 webView2 = webViewPair.Value;
+                AdjustWebView2Zoom(webView2);
+            }
+        }
+        private async void AdjustWebView2Zoom(WebView2 webView2)
+        {
+            if (webView2.CoreWebView2 != null)
+            {
+                var dpiRatio = VisualTreeHelper.GetDpi(this).DpiScaleX;
+                await webView2.CoreWebView2.ExecuteScriptAsync($"document.body.style.zoom = {dpiRatio};");
+            }
+        }
         private void InitializeAllTabs()
         {
             ConfigGetSet configGetSet = new ConfigGetSet();
@@ -437,15 +456,15 @@ namespace MultiAIClient
         #region  url open methods
         private void WebView2_CoreWebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {
-            HandleNavigation(e.Uri, e);
+            //HandleNavigation(e.Uri, e);
         }
 
         private void WebView2_CoreWebView2_NewWindowRequested(object? sender, CoreWebView2NewWindowRequestedEventArgs e)
         {
-            if (HandleNavigation(e.Uri, e))
-            {
-                e.Handled = true;
-            }
+            //if (HandleNavigation(e.Uri, e))
+            //{
+            //    e.Handled = true;
+            //}
         }
         private void WebView2_CoreWebView2_FrameCreated(object? sender, CoreWebView2FrameCreatedEventArgs e)
         {
@@ -459,12 +478,12 @@ namespace MultiAIClient
 
         private void Frame_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {
-            HandleNavigation(e.Uri, e);
+            //HandleNavigation(e.Uri, e);
         }
 
         private void WebView2_CoreWebView2_FrameNavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {
-            HandleNavigation(e.Uri, e);
+            //HandleNavigation(e.Uri, e);
         }
 
         private bool HandleNavigation(string navigationUrl, object eventArgs)
@@ -616,8 +635,6 @@ namespace MultiAIClient
         }
         private async void UniversalSendButton_Click(object sender, RoutedEventArgs e)
         {
-            _ = await GetAllQuestions();//显示当前会话的提问次数
-
             string inputText = UniversalInputTextBox.Text.Trim();
             if (string.IsNullOrEmpty(inputText))
             {
@@ -654,6 +671,8 @@ namespace MultiAIClient
             }
             // 清空主输入框
             if (checkBoxClean.IsChecked == true) UniversalInputTextBox.Clear();
+
+            _ = await GetAllQuestions();//显示当前会话的提问次数
 
         }
 
@@ -704,13 +723,21 @@ namespace MultiAIClient
 
         private async void ButtonNextMesg_Click(object sender, RoutedEventArgs e)
         {
-            mesgCount.Content = await IndexButtonClick(Scripts.GetNextMesgageJS());
+            try
+            {
+                mesgCount.Content = await IndexButtonClick(Scripts.GetNextMesgageJS());
+            }
+            catch { }
         }
-
         private async void ButtonPrevMesg_Click(object sender, RoutedEventArgs e)
         {
-            mesgCount.Content = await IndexButtonClick(Scripts.GetPrevMesgageJS());
+            try
+            {
+                mesgCount.Content = await IndexButtonClick(Scripts.GetPrevMesgageJS());
+            }
+            catch { }
         }
+        
 
         private async Task<string> IndexButtonClick(string command)
         {
@@ -849,6 +876,12 @@ namespace MultiAIClient
         {
 
             TopMostToggle.IsChecked = false;
+
+            double screenHeight = SystemParameters.WorkArea.Height;
+            this.Height = screenHeight;
+            this.Top = 0;
+            this.Left = 0;
+
         }
 
         // 窗体置顶

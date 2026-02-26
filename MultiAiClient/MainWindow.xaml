@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultiAIClient"
         mc:Ignorable="d"
+        UseLayoutRounding="True"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="我的多 AI 客户端"
         ShowInTaskbar="True"
@@ -20,14 +21,13 @@
         </ContextMenu>
 
     </Window.Resources>
-   
 
-    <Grid Name="main_grid">
+        <Grid Name="main_grid" >
 
         <Grid.RowDefinitions>
             <RowDefinition Height="*" MinHeight="300"/>
             <RowDefinition Height="5"/>
-            <RowDefinition Height="300" MinHeight="300" MaxHeight="700"/>
+            <RowDefinition Height="300" MinHeight="200" MaxHeight="600"/>
         </Grid.RowDefinitions>
 
         <!-- 第1行： TabControl 容器区域 -->
@@ -49,7 +49,8 @@
 
         <!-- 第2行：统一输入区域和发送控制容器 -->
         <Border Grid.Row="2" Background="{StaticResource Brush.Background.Main}" 
-                BorderBrush="#ddd" BorderThickness="0,1,0,0" Padding="10" Margin="0,0,0,-19">
+                BorderBrush="#ddd" 
+                BorderThickness="0,1,0,0" Padding="10" Margin="0,0,0,5">
             
             <!-- 拆分为左右两列-->
             <Grid x:Name="bottom">
@@ -80,7 +81,7 @@
                 <!--  右列： 多个Button容器 -->
                 <Border Grid.Column="1" Background="{StaticResource Brush.Background.Main}" 
                         BorderBrush="{StaticResource Brush.Border.Light}" BorderThickness="0,0,0,0" Padding="1">
-                    <Grid Name="allButtons" Width="240" Height="300">
+                    <Grid Name="allButtons" Width="240" Height="250">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="3*"/>
@@ -246,6 +247,5 @@ Click="ButtonBottomMesg_Click"/>
 
 
     </Grid>
-
 
 </Window>
