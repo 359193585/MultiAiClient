@@ -27,7 +27,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" MinHeight="300"/>
             <RowDefinition Height="5"/>
-            <RowDefinition Height="300" MinHeight="200" MaxHeight="600"/>
+            <RowDefinition Height="300" MinHeight="10" MaxHeight="900"/>
         </Grid.RowDefinitions>
 
         <!-- 第1行： TabControl 容器区域 -->
