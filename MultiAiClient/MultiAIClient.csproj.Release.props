@@ -4,9 +4,13 @@
 		<DefineConstants>TRACE</DefineConstants>
 
 		<!-- 版本号 -->
-		<Version>1.2.0.3</Version>
-		<FileVersion>1.2.0.3</FileVersion>
-
+		<Version>1.2.0.4</Version>
+		<FileVersion>$(Version)</FileVersion>
+		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<InformationalVersion>$(Version)</InformationalVersion>
+		<Deterministic>true</Deterministic>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		
 		<!-- 输出目录 -->
 		<PublishDir>bin\release\MultiAiClient_single</PublishDir>
 		
@@ -101,8 +105,58 @@
 
 	<!-- 定义在Release模式下构建后自动发布的目标 -->
 	<Target Name="AutoPublishOnReleaseBuild" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
-		<Message Importance="high" Text="开始自动发布流程..." />
+		<Message Importance="high" Text="========== 开始自动发布流程..." />
 		<Exec Command="dotnet publish -c Release --no-build" />
+	    <Message Importance="high" Text="========== 自动发布完成 ==========" />
 	</Target>
+
+
+
+
+
+
+
+
+
+	<!-- 自动打包发布文件为ZIP（兼容所有.NET版本） -->
+	<Target Name="ZipPublishedFiles" AfterTargets="AutoPublishOnReleaseBuild" Condition=" '$(Configuration)' == 'Release' ">
+		<Message Importance="high" Text="========== 开始打包发布文件..." />
+
+		<!-- 定义版本号属性 -->
+		<PropertyGroup>
+			<CurrentVersion Condition="'$(Version)' == ''">1.0.0.0</CurrentVersion>
+			<CurrentVersion Condition="'$(Version)' != ''">$(Version)</CurrentVersion>
+
+			<!-- 发布目录 -->
+			<PublishOutputDir>$(MSBuildProjectDirectory)\bin\release\MultiAiClient_single</PublishOutputDir>
+			<ZipFileName>MultiAiClient_single_V$(CurrentVersion).zip</ZipFileName>
+			<ZipFilePath>$(MSBuildProjectDirectory)\publish\$(ZipFileName)</ZipFilePath>
+
+			<!-- 临时工作目录 -->
+			<TempZipDir>$(PublishOutputDir)_temp_zip</TempZipDir>
+		</PropertyGroup>
+
+		<!-- 检查发布目录是否存在 -->
+		<Message Importance="high" Text="检查发布目录: $(PublishOutputDir)" />
+		<Message Condition="Exists($(PublishOutputDir))" Importance="high" Text="发布目录存在，版本: $(CurrentVersion)" />
+		<Warning Condition="!Exists($(PublishOutputDir))" Text="发布目录不存在: $(PublishOutputDir)" />
+
+		<!-- 创建ZIP文件 -->
+		<ItemGroup>
+			<FilesToZip Include="$(PublishOutputDir)\**\*.*" />
+		</ItemGroup>
+
+		<!-- 使用内置的ZipDirectory任务（.NET 5+） -->
+		<ZipDirectory
+		  Condition="Exists($(PublishOutputDir))"
+		  SourceDirectory="$(PublishOutputDir)"
+		  DestinationFile="$(ZipFilePath)"
+		  Overwrite="true" />
+
+		<Message Condition="Exists($(ZipFilePath))" Importance="high" Text="========== 打包完成: $(ZipFilePath) ==========" />
+		<Warning Condition="!Exists($(ZipFilePath))" Text="========== 打包失败: $(ZipFilePath) ==========" />
+	</Target>
+	
+	
 </Project>
 
