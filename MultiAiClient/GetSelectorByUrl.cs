@@ -63,6 +63,11 @@ namespace MultiAIClient
                     ".max-w-full .container-QQkdo4",
                     "button[data-testid=\"chat_input_send_button\" ][id=\"flow-end-msg-send\"]"];
 
+            if (currentUrl.Contains("yuanqi.tencent.com"))
+                return [
+                    "div.ql-editor.ql-blank",
+                    ".max-w-full .container-QQkdo4",
+                    "div.toolbar-btn-wrapper"];
 
             //其他，尝试一个初始值
             return [

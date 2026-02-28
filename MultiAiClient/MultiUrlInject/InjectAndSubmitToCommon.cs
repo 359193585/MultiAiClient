@@ -1,14 +1,14 @@
 ﻿/*****************************************
  *
  * 项目名称： MultiAIClient  
- * 文 件 名:  InjectDoubao.cs
+ * 文 件 名:  InjectAndSubmitToDoubao - 复制.cs
  * 命名空间： MultiAIClient.MultiUrlInject
  * 描    述:  
  * 
  * 版    本：  V1.0
  * 创 建 者：  liuxin
  * 电子邮件：  359193585@qq.com(leison)
- * 创建时间：  2025/12/12 12:47
+ * 创建时间：  2026/2/26 16:46
  * ======================================
  * 历史更新记录
  * 版本：V          修改时间：         修改人：
@@ -24,11 +24,11 @@ using System.Threading.Tasks;
 
 namespace MultiAIClient.MultiUrlInject
 {
-    internal class InjectToDoubao
+    internal class InjectToCommon
     {
         internal static async Task<bool> InjectModule(WebView2 targetWebView)
         {
-            string script = await Scripts.LoadInjectionScriptAsync("DoubaoSend.js");
+            string script = await Scripts.LoadInjectionScriptAsync("CommonSend.js");
             return await Scripts.RunInjectScript(targetWebView, script, "通用脚本注入");
         }
 

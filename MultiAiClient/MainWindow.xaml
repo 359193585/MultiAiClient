@@ -121,7 +121,7 @@
 
                                                 <CheckBox Grid.Row="0" 
                                                      x:Name="checkBoxSendOnly"  
-                                                     IsChecked="False" 
+                                                     IsChecked="True" 
                                                      Content="只发本窗口" 
                                                      VerticalAlignment="Center" 
                                                      HorizontalAlignment="Center"
@@ -132,7 +132,7 @@
 
                                                 <CheckBox  Grid.Row="1" 
                                                      x:Name="checkBoxClean"
-                                                     IsChecked="True"  
+                                                     IsChecked="False"  
                                                      Content="发送后清空" 
                                                       VerticalAlignment="Center" 
                                                      HorizontalAlignment="Center"

@@ -339,12 +339,12 @@ namespace MultiAIClient
                     else if (currentUrl.Contains("doubao.com"))
                     {
                         //豆包
-                        await InjectCommno.InjectModule(webView);
+                        await InjectToDoubao.InjectModule(webView);
                     }
                     else
                     {
                         //其他类似的AI对话
-                        await InjectCommno.InjectModule(webView);
+                        await InjectToDoubao.InjectModule(webView);
                     }
 
                     Debug.WriteLine("导航完成，脚本注入操作完成，请关注状态是否成功。");
@@ -705,12 +705,12 @@ namespace MultiAIClient
                 else if (currentUrl.Contains("doubao.com"))
                 {
                     //豆包AI
-                    await InjectCommno.SubmitQuestion(targetWebView, inputText);
+                    await InjectToDoubao.SubmitQuestion(targetWebView, inputText);
                 }
                 else
                 {
                     //其他任意网站
-                    await InjectCommno.SubmitQuestion(targetWebView, inputText);
+                    await InjectToDoubao.SubmitQuestion(targetWebView, inputText);
                 }
 
             }
