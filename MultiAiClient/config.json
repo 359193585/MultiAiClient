@@ -18,14 +18,19 @@
     "url": "https://gemini.google.com/app",
     "dataFolderName": "Data_Gemini",
     "iconPath": "Icons/gemini_logo.png",
-    "order": 2
+    "order": 2,
+    "proxy": true
   },
   {
     "name": "ChatGPT",
     "url": "https://chatgpt.com/",
     "dataFolderName": "Data_ChatGPT",
     "iconPath": "Icons/chartgpt_logo.png",
-    "order": 3
+    "order": 3,
+    "proxy": true,
+    "proxyServer": "http://172.16.15.201:7893",
+    "proxyUserName": "Clash",
+    "proxyPassword": "Clash"
   },
   {
     "name": "DeepSeek AI",

@@ -161,7 +161,8 @@ namespace MultiAIClient
                         url: service.Url,
                         serviceName: service.Name,
                         dataFolderName: service.DataFolderName,
-                        tabItem: tabItem
+                        tabItem: tabItem,
+                        service
                     );
                     AIAggregatorTabs.SelectionChanged += OnTabSelectionChanged;
                 }
@@ -194,7 +195,8 @@ namespace MultiAIClient
                            url: serviceConfig.Url,
                            serviceName: serviceConfig.Name,
                            dataFolderName: serviceConfig.DataFolderName,
-                           tabItem: selectedTabItem
+                           tabItem: selectedTabItem,
+                           config: serviceConfig
                             );
                     }
                 }
@@ -384,7 +386,8 @@ namespace MultiAIClient
             string url,
             string serviceName,
             string dataFolderName,
-            TabItem tabItem)
+            TabItem tabItem,
+            AiServiceConfig config)
         {
             try
             {
@@ -414,14 +417,16 @@ namespace MultiAIClient
                 // 选项4: 禁用特定类型的缓存
                 //creationOptions.AdditionalBrowserArguments = "--disable-features=VizDisplayCompositor";
 #endif
+               
+                    // 配置系统代理（如果需要）
+                    await SetProxy(webView, config, userDataPath, creationOptions);
 
-                //  创建 CoreWebView2Environment,传递给 WebView2 控件
-                CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath, creationOptions);
-                await webView.EnsureCoreWebView2Async(environment);
                 // 订阅导航开始事件
                 webView.CoreWebView2.NavigationStarting += WebView2_CoreWebView2_NavigationStarting;
                 webView.CoreWebView2.FrameCreated += WebView2_CoreWebView2_FrameCreated;
                 webView.CoreWebView2.NewWindowRequested += WebView2_CoreWebView2_NewWindowRequested;
+
+
 
 
 #if DEBUG
@@ -452,7 +457,31 @@ namespace MultiAIClient
             }
         }
 
-      
+        private static async Task SetProxy(WebView2 webView, AiServiceConfig config, string userDataPath, CoreWebView2EnvironmentOptions creationOptions)
+        {
+            if (!string.IsNullOrWhiteSpace(config.ProxyServer))
+            {
+                // 注意：这里只设置代理服务器地址和端口，不包含用户名密码
+                creationOptions.AdditionalBrowserArguments = $"--proxy-server=\"{config.ProxyServer}\"";
+            }
+
+            //  创建 CoreWebView2Environment,传递给 WebView2 控件
+            CoreWebView2Environment environment = await CoreWebView2Environment.CreateAsync(null, userDataPath, creationOptions);
+            await webView.EnsureCoreWebView2Async(environment);
+
+            // 订阅代理认证事件
+            if (!string.IsNullOrWhiteSpace(config.ProxyUserName) && !string.IsNullOrWhiteSpace(config.ProxyPassword))
+            {
+                webView.CoreWebView2.BasicAuthenticationRequested += (sender, e) =>
+                {
+
+                    e.Response.UserName = config.ProxyUserName;
+                    e.Response.Password = config.ProxyPassword;
+                };
+            }
+        }
+
+
         #region  url open methods
         private void WebView2_CoreWebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {

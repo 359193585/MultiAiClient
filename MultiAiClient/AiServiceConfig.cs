@@ -47,6 +47,18 @@ namespace MultiAIClient
 
         [JsonPropertyName("order")]
         public int Order { get; set; } = 0;
+
+        [JsonPropertyName("proxy")]
+        public bool Proxy { get; set; } = false;
+
+        [JsonPropertyName("proxyServer")]
+        public string ProxyServer { get; set; } = string.Empty;
+
+        [JsonPropertyName("proxyUserName")]
+        public string ProxyUserName { get; set; } = string.Empty;
+
+        [JsonPropertyName("proxyPassword")]
+        public string ProxyPassword { get; set; } = string.Empty;
     }
 
     public class ConfigGetSet
